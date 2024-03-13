@@ -117,8 +117,8 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     int bombCounter = 0;
     for(int i = 0; bombCounter < numOfBombs; i++) //пока что не работает
     {
-        int o = rand() % 20;
-        int p = rand() % 20;
+        int o = rand() % n;
+        int p = rand() % m;
         if(pitch[o][p] == 0)
         {
             pitch[o][p] = -1;
