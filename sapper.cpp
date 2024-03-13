@@ -70,7 +70,21 @@ int symbol_scanning(int overfmax, int overfmin) //эта функция зани
                 if (c < '0' || c > '9')   //если прочитанный символ - не цифра, лезем проверять что же это              
                 {
                     if (c != '\n') {printf("Вы ввели неверный символ, повторите попытку\n"); clean_stdin();} // если это не перенос строки - кидаем ошибку
-                    else if(counter != 0) {count = true; break;} //если это перенос строки не первым же символом - все круто, прерываем цикл
+                    else if(counter != 0) 
+                    {
+                        if(num < overfmin) 
+                        {
+                        printf("Число меньше минимального (%d). Повторите попытку\n", overfmin);
+                        num = 0;
+                        clean_stdin();
+                        counter = 0;
+                        }
+                        else
+                        {
+                        count = true; 
+                        break;
+                        }
+                    } //если это перенос строки не первым же символом - все круто, прерываем цикл
                     else {printf("Вы ввели неверный символ, повторите попытку\n");} //если первым - выдаем ошибку
                 }
                 else{
@@ -85,16 +99,6 @@ int symbol_scanning(int overfmax, int overfmin) //эта функция зани
                 {
                 printf("Число превысило максимальный размер (%d). Повторите попытку\n", overfmax);
                 counter = 0;
-                }
-                else
-                {
-                if(num < overfmin) //нельзя писать двузначные, сделать как с максимумом
-                {
-                printf("Число меньше минимального (%d). Повторите попытку\n", overfmin);
-                num = 0;
-                clean_stdin();
-                counter = 0;
-                }
                 }
     }
     return num;
@@ -113,11 +117,11 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     int bombCounter = 0;
     for(int i = 0; bombCounter < numOfBombs; i++) //пока что не работает
     {
-        int n = rand() % 20;
-        int m = rand() % 20;
-        if(pitch[n][m] == 0)
+        int o = rand() % 20;
+        int p = rand() % 20;
+        if(pitch[o][p] == 0)
         {
-            pitch[n][m] = -1;
+            pitch[o][p] = -1;
             bombCounter++;
         }
     }
@@ -191,26 +195,37 @@ int main()
             case 1: 
             printf("Введите высоту\n");
             n = symbol_scanning(20);
+            system("clear");
             break;
 
             case 2: 
             printf("Введите длину\n");
             m = symbol_scanning(20);
+            system("clear");
             break;
 
             case 3: 
+            if(!n || !m) printf("Сначала введите высоту и длину\n\n");
+            else
+            {
             printf("Введите число бомб, максимальное число бомб - %d, минимальное - 4\n", n*m/3);
             numberOfBombs = symbol_scanning(n*m/3, 4);
+            system("clear");
+            }
             break;
 
             case 4: 
+            if(!n || !m || !numberOfBombs) printf("Сначала введите высоту, длину и число бомб\n\n");
+            else 
+            {
             creating(pitch, n, m, numberOfBombs);
             getchar();
+            system("clear");
+            }
             break;
 
             case 5: printf("Таблица рекордов в разработке\n"); break;
         }
-        system("clear");
     }
     }
 
