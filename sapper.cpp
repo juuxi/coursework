@@ -4,6 +4,9 @@
 #include <termios.h>
 #include <time.h>
 
+const char BOMB[] = "\U0001f4a3";
+const char FLOOR[] = "\U00002b1c";
+
 static struct termios oldt;
 
 void restore_terminal_settings(void)
@@ -104,6 +107,46 @@ int symbol_scanning(int overfmax, int overfmin) //эта функция зани
     return num;
 }
 
+void mark_around(int pitch[20][20], int n, int m, int i, int j)
+{
+    if(i != n-1 && i != 0 && j != 0 && j != m-1)
+    {
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
+    }
+
+    if(i == 0 && j == 0)
+    {
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+    }
+    if(i == n-1 && j == 0)
+    {
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+    }
+    if(i == n-1 && j == m-1)
+    {
+        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+    }
+    if(i == 0 && j == m-1)
+    {
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+    }
+}
+
 void creating(int pitch[20][20], int n, int m, int numOfBombs)
 {   
     for(int i = 0; i < n; i++)
@@ -115,13 +158,14 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     }
     srand(time(NULL)); 
     int bombCounter = 0;
-    for(int i = 0; bombCounter < numOfBombs; i++) //пока что не работает
+    for(int i = 0; bombCounter < numOfBombs; i++)
     {
         int o = rand() % n;
         int p = rand() % m;
-        if(pitch[o][p] == 0)
+        if(pitch[o][p] != -1)
         {
             pitch[o][p] = -1;
+            mark_around(pitch, n, m, o, p);
             bombCounter++;
         }
     }
@@ -130,7 +174,14 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     {
         for(int j = 0; j < m; j++)
         {
-            printf("%3d", pitch[i][j]);
+            if(pitch[i][j] > 0)
+            printf("%2d", pitch[i][j]);
+
+            if(pitch[i][j] == -1) 
+            printf("%3s", BOMB);
+
+            if(pitch[i][j] == 0)
+            printf("%3s", FLOOR);
         }
         printf("\n");
     }
