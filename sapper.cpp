@@ -145,6 +145,39 @@ void mark_around(int pitch[20][20], int n, int m, int i, int j)
         if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
         if(pitch[i][j+1] != -1) pitch[i][j+1]++;
     }
+
+    if(i == 0 && j != 0 && j != m-1)
+    {
+        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+    }
+    if(i == n-1 && j != 0 && j != m-1)
+    {
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+    }
+    if(j == 0 && i != 0 && i != n-1)
+    {
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+    }
+    if(j == m-1 && i != 0 && i != n-1)
+    {
+        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+    }
 }
 
 void creating(int pitch[20][20], int n, int m, int numOfBombs)
@@ -153,7 +186,7 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     {
         for(int j = 0; j < m; j++)
         {
-            pitch[i][j] = 0;
+            pitch[i][j] = 1000;
         }
     }
     srand(time(NULL)); 
@@ -170,7 +203,7 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
         }
     }
 
-    for(int i = 0; i < n; i++)
+    /* for(int i = 0; i < n; i++)
     {
         for(int j = 0; j < m; j++)
         {
@@ -184,8 +217,27 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
             printf("%3s", FLOOR);
         }
         printf("\n");
-    }
+    } */
     //if(err == true) printf("Введен неверный символ\n");
+}
+
+void printPitch(int pitch[20][20], int n, int m)
+{
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < m; j++)
+        {
+            if(pitch[i][j] > 1000)
+            printf("%2d", pitch[i][j]-1000);
+
+            if(pitch[i][j] == -1) 
+            printf("%3s", BOMB);
+
+            if(pitch[i][j] == 1000)
+            printf("%3s", FLOOR);
+        }
+        printf("\n");
+    }
 }
 
 int main()
@@ -270,6 +322,7 @@ int main()
             else 
             {
             creating(pitch, n, m, numberOfBombs);
+            printPitch(pitch, n, m);
             getchar();
             system("clear");
             }
