@@ -6,6 +6,11 @@
 
 const char BOMB[] = "\U0001f4a3";
 const char FLOOR[] = "\U00002b1c";
+const char CLOSED_FLOOR[] = "\U0001f533";
+const char PLAYER[] = "\U0001f610";
+const char FLAG[] = "\U0001f6a9";
+
+#define BOMB_NUM 999
 
 static struct termios oldt;
 
@@ -111,72 +116,72 @@ void mark_around(int pitch[20][20], int n, int m, int i, int j)
 {
     if(i != n-1 && i != 0 && j != 0 && j != m-1)
     {
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
     }
 
     if(i == 0 && j == 0)
     {
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
     }
     if(i == n-1 && j == 0)
     {
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
-        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
     }
     if(i == n-1 && j == m-1)
     {
-        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
-        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
+        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
     }
     if(i == 0 && j == m-1)
     {
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
     }
 
     if(i == 0 && j != 0 && j != m-1)
     {
-        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
+        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
     }
     if(i == n-1 && j != 0 && j != m-1)
     {
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
     }
     if(j == 0 && i != 0 && i != n-1)
     {
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != -1) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != -1) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != -1) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
     }
     if(j == m-1 && i != 0 && i != n-1)
     {
-        if(pitch[i-1][j] != -1) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != -1) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != -1) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != -1) pitch[i+1][j-1]++;
-        if(pitch[i+1][j] != -1) pitch[i+1][j]++;
+        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
     }
 }
 
@@ -195,9 +200,9 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     {
         int o = rand() % n;
         int p = rand() % m;
-        if(pitch[o][p] != -1)
+        if(pitch[o][p] != BOMB_NUM)
         {
-            pitch[o][p] = -1;
+            pitch[o][p] = BOMB_NUM;
             mark_around(pitch, n, m, o, p);
             bombCounter++;
         }
@@ -227,14 +232,23 @@ void printPitch(int pitch[20][20], int n, int m)
     {
         for(int j = 0; j < m; j++)
         {
-            if(pitch[i][j] > 1000)
-            printf("%2d", pitch[i][j]-1000);
-
             if(pitch[i][j] == -1) 
             printf("%3s", BOMB);
 
-            if(pitch[i][j] == 1000)
+            if(pitch[i][j] == 0)
             printf("%3s", FLOOR);
+
+            if(pitch[i][j] == 100)
+            printf("%3s", FLAG);
+
+            if(pitch[i][j] == 300)
+            printf("%3s", PLAYER);
+
+            if(pitch[i][j] > 998)
+            printf("%3s", CLOSED_FLOOR);
+
+            if(pitch[i][j] > 0 && pitch[i][j] < 10)
+            printf("%2d", pitch[i][j]);
         }
         printf("\n");
     }
@@ -245,6 +259,7 @@ int main()
     bool isIntoBlock = false;
     int pitch[20][20];
     int n = 0, m = 0, pos = 1, numberOfBombs = 0;
+    int xPlayer = 0, yPlayer = 0;
     char menuCatcher, checkArrow;
     int endd[4] = {0, 0, 0, 0};
     while(true)
@@ -323,6 +338,7 @@ int main()
             {
             creating(pitch, n, m, numberOfBombs);
             printPitch(pitch, n, m);
+            xPlayer = n / 2 - 1; yPlayer = m / 2 - 1;
             getchar();
             system("clear");
             }
