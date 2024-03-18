@@ -7,7 +7,7 @@
 const char BOMB[] = "\U0001f4a3";
 const char FLOOR[] = "\U00002b1c";
 const char CLOSED_FLOOR[] = "\U0001f533";
-const char PLAYER[] = "\U0001f610";
+const char SMILE[] = "\U0001f610";
 const char FLAG[] = "\U0001f6a9";
 
 #define BOMB_NUM 999
@@ -30,6 +30,12 @@ newt.c_lflag &= ~(ICANON | ECHO); /* Change settings */
 tcsetattr(0, TCSANOW, &newt); /* Apply settings */
 atexit(restore_terminal_settings); /* Make sure settings will be restored when program ends */
 }
+
+struct preMovement{
+    int x;
+    int y;
+    int value;
+};
 
 void clean_stdin(void) //очистка потока ввода, применяется там где без нее scanf начнет читать всякие необработанные символы
 {
@@ -242,7 +248,7 @@ void printPitch(int pitch[20][20], int n, int m)
             printf("%3s", FLAG);
 
             if(pitch[i][j] == 300)
-            printf("%3s", PLAYER);
+            printf("%3s", SMILE);
 
             if(pitch[i][j] > 998)
             printf("%3s", CLOSED_FLOOR);
@@ -254,12 +260,41 @@ void printPitch(int pitch[20][20], int n, int m)
     }
 }
 
+void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
+{
+    preMovement preM;
+    preM.x = xSmile;
+    preM.y = ySmile;
+    preM.value = pitch[ySmile][xSmile];
+    pitch[ySmile][xSmile] = 300;
+    printPitch(pitch, n, m);
+    while(true)
+    {
+    printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой\n");
+    disable_waiting_for_enter();
+    char movement = getchar();
+    restore_terminal_settings();
+    switch(movement)
+    {
+        case 'w': 
+        pitch[ySmile][xSmile] = preM.value;
+        ySmile -= 1;
+        preM.value = pitch[ySmile][xSmile];
+        pitch[ySmile][xSmile] = 300;
+        break;
+    }
+    system("clear");
+    printPitch(pitch, n, m);
+    break;
+    }
+}
+
 int main()
 {
     bool isIntoBlock = false;
     int pitch[20][20];
     int n = 0, m = 0, pos = 1, numberOfBombs = 0;
-    int xPlayer = 0, yPlayer = 0;
+    int xSmile = 0, ySmile = 0;
     char menuCatcher, checkArrow;
     int endd[4] = {0, 0, 0, 0};
     while(true)
@@ -337,8 +372,8 @@ int main()
             else 
             {
             creating(pitch, n, m, numberOfBombs);
-            printPitch(pitch, n, m);
-            xPlayer = n / 2 - 1; yPlayer = m / 2 - 1;
+            ySmile = n / 2; xSmile = m / 2;
+            movingSmile(pitch, n, m, ySmile, xSmile);
             getchar();
             system("clear");
             }
@@ -348,22 +383,5 @@ int main()
         }
     }
     }
-
-    /* for(int i = 0; i < n; i++)
-    {
-        for(int j = 0; j < m; j++)
-        {
-            switch(pitch[i][j])
-            {
-            case 0:  printf("%s", "\U0001f9f1"); break;   
-            case 10: printf("%s", "\U0001f300"); break;     
-            case 20: printf("%s", "\U0001f6a7"); break;
-            case 35: printf("%s", "\U0001f600"); break;
-            case 70: printf("%s", "\U0001f9f1"); break;
-            default: printf("%s", "\U0001f300");
-            } 
-        }
-        printf("\n");
-    } */
     return 0;
 }
