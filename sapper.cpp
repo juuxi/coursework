@@ -260,13 +260,16 @@ void printPitch(int pitch[20][20], int n, int m)
     }
 }
 
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value);
+
 void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
 {
     preMovement preM;
     preM.x = xSmile;
     preM.y = ySmile;
-    preM.value = pitch[ySmile][xSmile];
+    int value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = 300;
+    bool endd = false;
     printPitch(pitch, n, m);
     while(true)
     {
@@ -277,16 +280,66 @@ void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
     switch(movement)
     {
         case 'w': 
-        pitch[ySmile][xSmile] = preM.value;
-        ySmile -= 1;
-        preM.value = pitch[ySmile][xSmile];
+        pitch[ySmile][xSmile] = value;
+        if(ySmile != 0) ySmile -= 1;
+        value = pitch[ySmile][xSmile];
         pitch[ySmile][xSmile] = 300;
         break;
+
+        case 'a':
+        pitch[ySmile][xSmile] = value;
+        if(xSmile != 0) xSmile -= 1;
+        value = pitch[ySmile][xSmile];
+        pitch[ySmile][xSmile] = 300;
+        break;
+
+        case 's':
+        pitch[ySmile][xSmile] = value;
+        if(ySmile != n-1) ySmile += 1;
+        value = pitch[ySmile][xSmile];
+        pitch[ySmile][xSmile] = 300;
+        break;
+
+        case 'd':
+        pitch[ySmile][xSmile] = value;
+        if(xSmile != m-1) xSmile += 1;
+        value = pitch[ySmile][xSmile];
+        pitch[ySmile][xSmile] = 300;
+        break;
+
+        case 'p':
+        digging(pitch, n, m, ySmile, xSmile, value);
+        if(value == -1) endd = true;
+        break;
+
+        case 10: endd = true; break;
     }
     system("clear");
     printPitch(pitch, n, m);
-    break;
+    if(endd == true) break;
     }
+}
+
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value)
+{
+    switch(value)
+    {
+        case 999:
+        printf("Игра окончена\n");
+        pitch[ySmile][xSmile] = value;
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = 0; j < m; j++)
+            pitch[i][j] -= 1000;
+        }
+        printPitch(pitch, n, m);
+        break;
+
+        case 1000: 
+        break;
+    }
+    if(value > 1000 && value < 1010)
+        value -=1000;
 }
 
 int main()
@@ -374,8 +427,8 @@ int main()
             creating(pitch, n, m, numberOfBombs);
             ySmile = n / 2; xSmile = m / 2;
             movingSmile(pitch, n, m, ySmile, xSmile);
-            getchar();
-            system("clear");
+            /* getchar();
+            system("clear"); */
             }
             break;
 
