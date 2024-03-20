@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <termios.h>
 #include <time.h>
+#include <iostream>
 
 const char BOMB[] = "\U0001f4a3";
 const char FLOOR[] = "\U00002b1c";
@@ -30,6 +31,78 @@ newt.c_lflag &= ~(ICANON | ECHO); /* Change settings */
 tcsetattr(0, TCSANOW, &newt); /* Apply settings */
 atexit(restore_terminal_settings); /* Make sure settings will be restored when program ends */
 }
+
+struct coordinates {
+    int x;
+    int y;
+};
+
+struct Node{
+    coordinates val;
+    Node* next;
+    Node(coordinates _val) 
+    {
+        val = _val;
+        next = nullptr;
+    }
+};
+
+struct MyList{
+    Node* first;
+    Node* last;
+    MyList()
+    {
+        first = nullptr;
+        last = nullptr;
+    }
+
+    bool is_empty()
+    {
+        return first == nullptr;
+    }
+
+    void push_back(coordinates _val)
+    {
+        Node* p = new Node(_val);
+        if(is_empty())
+        {
+            first = p;
+            last = p;
+            return;
+        }
+        last->next = p;
+        last = p;
+    }
+
+    void print_first() 
+    {
+        if(is_empty()) return;
+        Node* p = first;
+        std::cout << p->val.x;
+        std::cout << p->val.y;
+    }
+
+    void remove_first()
+    {
+        if(is_empty()) return;
+        Node* p = first;
+        first = p->next;
+        delete p;
+        p = nullptr;
+    }
+
+    void remove_list()
+    {
+        while(!is_empty())
+        {
+            Node* p = first;
+            first = p->next;
+            delete p;
+            p = nullptr;
+        }
+        printf("Список удален");
+    }
+};
 
 struct preMovement{
     int x;
@@ -330,7 +403,7 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
         for(int i = 0; i < n; ++i)
         {
             for(int j = 0; j < m; j++)
-            pitch[i][j] -= 1000;
+            if(pitch[i][j] > 998) pitch[i][j] -= 1000;
         }
         printPitch(pitch, n, m);
         break;
