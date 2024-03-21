@@ -74,12 +74,10 @@ struct MyList{
         last = p;
     }
 
-    void print_first() 
+    Node* get_first() 
     {
-        if(is_empty()) return;
-        Node* p = first;
-        std::cout << p->val.x;
-        std::cout << p->val.y;
+        if(is_empty()) return nullptr;
+        return first;
     }
 
     void remove_first()
@@ -100,7 +98,6 @@ struct MyList{
             delete p;
             p = nullptr;
         }
-        printf("Список удален");
     }
 };
 
@@ -409,6 +406,73 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
         break;
 
         case 1000: 
+        MyList list;
+        coordinates coord;
+        coord.y = ySmile;
+        coord.x = xSmile;
+        list.push_back(coord);
+        Node* checker;
+        value -= 1000;
+        int toCheck = 4;
+        int nChecker = 0;
+        while(true)
+        {
+            for(int i = 0; i < toCheck; ++i)
+            {
+                checker = list.get_first();
+                if(checker != nullptr)
+                {                    
+                    if(pitch[checker->val.y-1][checker->val.x] == 1000)
+                    {
+                        pitch[checker->val.y-1][checker->val.x] -= 1000;
+                        coord.y = checker->val.y-1;
+                        coord.x = checker->val.x;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y-1][checker->val.x] > 1000)
+                        pitch[checker->val.y-1][checker->val.x] -= 1000;
+
+                    if(pitch[checker->val.y+1][checker->val.x] == 1000)
+                    {
+                        pitch[checker->val.y+1][checker->val.x] -= 1000;
+                        coord.y = checker->val.y+1;
+                        coord.x = checker->val.x;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y+1][checker->val.x] > 1000)
+                        pitch[checker->val.y+1][checker->val.x] -= 1000;
+
+                    if(pitch[checker->val.y][checker->val.x-1] == 1000)
+                    {
+                        pitch[checker->val.y][checker->val.x-1] -= 1000;
+                        coord.y = checker->val.y;
+                        coord.x = checker->val.x-1;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y][checker->val.x-1] > 1000)
+                        pitch[checker->val.y][checker->val.x-1] -= 1000;
+
+                    if(pitch[checker->val.y][checker->val.x+1] == 1000)
+                    {
+                        pitch[checker->val.y][checker->val.x+1] -= 1000;
+                        coord.y = checker->val.y;
+                        coord.x = checker->val.x+1;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y][checker->val.x+1] > 1000)
+                        pitch[checker->val.y][checker->val.x+1] -= 1000;
+
+                    list.remove_first();
+                }
+            }
+            if(nChecker == 0) break;
+            else toCheck = nChecker;
+            nChecker = 0;
+        }
         break;
     }
     if(value > 1000 && value < 1010)
