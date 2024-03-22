@@ -314,13 +314,13 @@ void printPitch(int pitch[20][20], int n, int m)
             if(pitch[i][j] == 0)
             printf("%3s", FLOOR);
 
-            if(pitch[i][j] == 100)
+            if(pitch[i][j] > 1098)
             printf("%3s", FLAG);
 
             if(pitch[i][j] == 300)
             printf("%3s", SMILE);
 
-            if(pitch[i][j] > 998)
+            if(pitch[i][j] > 998 && pitch[i][j] < 1098)
             printf("%3s", CLOSED_FLOOR);
 
             if(pitch[i][j] > 0 && pitch[i][j] < 10)
@@ -330,11 +330,12 @@ void printPitch(int pitch[20][20], int n, int m)
     }
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value);
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
+void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
 {
     preMovement preM;
+    int numOfEmpty = m * n;
     preM.x = xSmile;
     preM.y = ySmile;
     int value = pitch[ySmile][xSmile];
@@ -377,9 +378,20 @@ void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
         pitch[ySmile][xSmile] = 300;
         break;
 
+        case 'm':
+        value += 100;
+        break;
+
         case 'p':
-        digging(pitch, n, m, ySmile, xSmile, value);
-        if(value == -1) endd = true;
+        digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+        if(value == 999) 
+        {
+            endd = true;
+            printf("Нажмите любую клавишу для продолжения\n");
+            getchar();
+        }
+        if(numOfEmpty == numOfBombs)
+            endd = true;
         break;
 
         case 10: endd = true; break;
@@ -390,29 +402,35 @@ void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile)
     }
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value)
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
 {
-    switch(value)
+    if(value == 999 || value == 1099)
     {
-        case 999:
-        printf("Игра окончена\n");
         pitch[ySmile][xSmile] = value;
         for(int i = 0; i < n; ++i)
         {
             for(int j = 0; j < m; j++)
+            {
             if(pitch[i][j] > 998) pitch[i][j] -= 1000;
+            if(pitch[i][j] == 100 || pitch[i][j] == 99 || pitch[i][j] > 100 && pitch[i][j] < 110) pitch[i][j] -= 100;
+            }
         }
+        system("clear");
         printPitch(pitch, n, m);
-        break;
+        printf("Вы проиграли\n");
+    }
 
-        case 1000: 
+    if(value == 1000 || value == 1100)
+    {
         MyList list;
         coordinates coord;
         coord.y = ySmile;
         coord.x = xSmile;
         list.push_back(coord);
         Node* checker;
-        value -= 1000;
+        if(value == 1000) value -= 1000;
+        if(value == 1100) value -= 1100;
+        numOfEmpty--;
         int toCheck = 4;
         int nChecker = 0;
         while(true)
@@ -427,13 +445,17 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     if(pitch[checker->val.y-1][checker->val.x] == 1000)
                     {
                         pitch[checker->val.y-1][checker->val.x] -= 1000;
+                        numOfEmpty--;
                         coord.y = checker->val.y-1;
                         coord.x = checker->val.x;
                         list.push_back(coord);
                         nChecker++;
                     }
                     if(pitch[checker->val.y-1][checker->val.x] > 1000)
+                    {
                         pitch[checker->val.y-1][checker->val.x] -= 1000;
+                        numOfEmpty--;
+                    }
                     }
 
                     if(checker->val.y != n - 1)
@@ -441,13 +463,17 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     if(pitch[checker->val.y+1][checker->val.x] == 1000)
                     {
                         pitch[checker->val.y+1][checker->val.x] -= 1000;
+                        numOfEmpty--;
                         coord.y = checker->val.y+1;
                         coord.x = checker->val.x;
                         list.push_back(coord);
                         nChecker++;
                     }
                     if(pitch[checker->val.y+1][checker->val.x] > 1000)
+                    {
                         pitch[checker->val.y+1][checker->val.x] -= 1000;
+                        numOfEmpty--;
+                    }
                     }
 
                     if(checker->val.x != 0)
@@ -455,13 +481,17 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     if(pitch[checker->val.y][checker->val.x-1] == 1000)
                     {
                         pitch[checker->val.y][checker->val.x-1] -= 1000;
+                        numOfEmpty--;
                         coord.y = checker->val.y;
                         coord.x = checker->val.x-1;
                         list.push_back(coord);
                         nChecker++;
                     }
                     if(pitch[checker->val.y][checker->val.x-1] > 1000)
+                    {
                         pitch[checker->val.y][checker->val.x-1] -= 1000;
+                        numOfEmpty--;
+                    }
                     }
 
                     if(checker->val.x != m - 1)
@@ -469,13 +499,17 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     if(pitch[checker->val.y][checker->val.x+1] == 1000)
                     {
                         pitch[checker->val.y][checker->val.x+1] -= 1000;
+                        numOfEmpty--;
                         coord.y = checker->val.y;
                         coord.x = checker->val.x+1;
                         list.push_back(coord);
                         nChecker++;
                     }
                     if(pitch[checker->val.y][checker->val.x+1] > 1000)
+                    {
                         pitch[checker->val.y][checker->val.x+1] -= 1000;
+                        numOfEmpty--;
+                    }
                     }
 
                     list.remove_first();
@@ -485,10 +519,18 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
             else toCheck = nChecker;
             nChecker = 0;
         }
-        break;
     }
+    
     if(value > 1000 && value < 1010)
+    {
         value -=1000;
+        numOfEmpty--;
+    }    
+    if(value > 1100 && value < 1110)
+    {
+        value -= 1100;
+        numOfEmpty--;
+    }
 }
 
 int main()
@@ -575,7 +617,9 @@ int main()
             {
             creating(pitch, n, m, numberOfBombs);
             ySmile = n / 2; xSmile = m / 2;
-            movingSmile(pitch, n, m, ySmile, xSmile);
+            movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
+            system("clear");
+            printf("Игра закончена\n\n");
             /* getchar();
             system("clear"); */
             }
