@@ -422,6 +422,8 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                 checker = list.get_first();
                 if(checker != nullptr)
                 {                    
+                    if(checker->val.y != 0)
+                    {
                     if(pitch[checker->val.y-1][checker->val.x] == 1000)
                     {
                         pitch[checker->val.y-1][checker->val.x] -= 1000;
@@ -432,7 +434,10 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     }
                     if(pitch[checker->val.y-1][checker->val.x] > 1000)
                         pitch[checker->val.y-1][checker->val.x] -= 1000;
+                    }
 
+                    if(checker->val.y != n - 1)
+                    {
                     if(pitch[checker->val.y+1][checker->val.x] == 1000)
                     {
                         pitch[checker->val.y+1][checker->val.x] -= 1000;
@@ -443,7 +448,10 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     }
                     if(pitch[checker->val.y+1][checker->val.x] > 1000)
                         pitch[checker->val.y+1][checker->val.x] -= 1000;
+                    }
 
+                    if(checker->val.x != 0)
+                    {
                     if(pitch[checker->val.y][checker->val.x-1] == 1000)
                     {
                         pitch[checker->val.y][checker->val.x-1] -= 1000;
@@ -454,7 +462,10 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     }
                     if(pitch[checker->val.y][checker->val.x-1] > 1000)
                         pitch[checker->val.y][checker->val.x-1] -= 1000;
+                    }
 
+                    if(checker->val.x != m - 1)
+                    {
                     if(pitch[checker->val.y][checker->val.x+1] == 1000)
                     {
                         pitch[checker->val.y][checker->val.x+1] -= 1000;
@@ -465,6 +476,7 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
                     }
                     if(pitch[checker->val.y][checker->val.x+1] > 1000)
                         pitch[checker->val.y][checker->val.x+1] -= 1000;
+                    }
 
                     list.remove_first();
                 }
