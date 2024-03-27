@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <time.h>
 #include <iostream>
+#include <ctime>
 
 const char BOMB[] = "\U0001f4a3";
 const char FLOOR[] = "\U00002b1c";
@@ -617,7 +618,15 @@ int main()
             {
             creating(pitch, n, m, numberOfBombs);
             ySmile = n / 2; xSmile = m / 2;
+            std::clock_t start;
+            double duration;
+            start = std::clock();
             movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
+            std::clock_t end = std::clock();
+            duration = (end - start) / (double) CLOCKS_PER_SEC;
+            duration += (end - start)/12000;
+            printf("%f", duration);
+            getchar();
             system("clear");
             printf("Игра закончена\n\n");
             /* getchar();
