@@ -4,7 +4,7 @@
 #include <termios.h>
 #include <time.h>
 #include <iostream>
-#include <ctime>
+#include <time.h>
 
 const char BOMB[] = "\U0001f4a3";
 const char FLOOR[] = "\U00002b1c";
@@ -536,6 +536,10 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 
 int main()
 {
+    //FILE* in;
+    FILE* out;
+    char buffer_out[100];
+    char name[] = "juuxi";
     bool isIntoBlock = false;
     int pitch[20][20];
     int n = 0, m = 0, pos = 1, numberOfBombs = 0;
@@ -618,15 +622,24 @@ int main()
             {
             creating(pitch, n, m, numberOfBombs);
             ySmile = n / 2; xSmile = m / 2;
-            std::clock_t start;
-            double duration;
-            start = std::clock();
+            struct timespec begin;
+            timespec_get(&begin, TIME_UTC);
             movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
-            std::clock_t end = std::clock();
-            duration = (end - start) / (double) CLOCKS_PER_SEC;
-            duration += (end - start)/12000;
-            printf("%f", duration);
+            struct timespec end;
+            timespec_get(&end, TIME_UTC);
+            double duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+            printf("Running time is %2.1f", duration);
             getchar();
+            out = fopen("table.txt", "w+");
+            if(out == NULL)
+                printf("err\n");
+            else
+            {
+                //sprintf(buffer_out, "%s %2.1f\n", name, duration);
+                fprintf(out, "%s %2.1f\n", name, duration);
+                fclose(out);
+            }
+
             system("clear");
             printf("Игра закончена\n\n");
             /* getchar();
