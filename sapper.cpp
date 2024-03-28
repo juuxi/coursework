@@ -333,8 +333,9 @@ void printPitch(int pitch[20][20], int n, int m)
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
+bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
 {
+    bool win = false;
     preMovement preM;
     int numOfEmpty = m * n;
     preM.x = xSmile;
@@ -392,7 +393,10 @@ void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
             getchar();
         }
         if(numOfEmpty == numOfBombs)
-            endd = true;
+        {
+            endd = true; 
+            win = true;
+        }
         break;
 
         case 10: endd = true; break;
@@ -401,6 +405,7 @@ void movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
     printPitch(pitch, n, m);
     if(endd == true) break;
     }
+    return win;
 }
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
@@ -539,7 +544,7 @@ int main()
     //FILE* in;
     FILE* out;
     char buffer_out[100];
-    char name[] = "juuxi";
+    char name[25];
     bool isIntoBlock = false;
     int pitch[20][20];
     int n = 0, m = 0, pos = 1, numberOfBombs = 0;
@@ -624,26 +629,39 @@ int main()
             ySmile = n / 2; xSmile = m / 2;
             struct timespec begin;
             timespec_get(&begin, TIME_UTC);
-            movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
+            bool win = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
             struct timespec end;
             timespec_get(&end, TIME_UTC);
             double duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
-            printf("Running time is %2.1f", duration);
-            getchar();
-            out = fopen("table.txt", "w+");
-            if(out == NULL)
-                printf("err\n");
-            else
+
+            if(win)
             {
-                //sprintf(buffer_out, "%s %2.1f\n", name, duration);
-                fprintf(out, "%s %2.1f\n", name, duration);
-                fclose(out);
+                printf("Введите свой псевдоним\n");
+                char c;
+                for(int i = 0; i < 25; ++i) //что делать если больше 25
+                {
+                    scanf("%c", &c);
+                    if(c == '\n') 
+                    {
+                        name[i+1] = '\0'; 
+                        break;
+                    }
+                    name[i] = c;
+                }
+                printf("Running time is %2.1f", duration);
+                getchar();
+                out = fopen("table.txt", "a+");
+                if(out == NULL)
+                    printf("err\n");
+                else
+                {
+                    fprintf(out, "%s %2.1f\n", name, duration);
+                    fclose(out);
+                }
             }
 
             system("clear");
             printf("Игра закончена\n\n");
-            /* getchar();
-            system("clear"); */
             }
             break;
 
