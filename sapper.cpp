@@ -539,6 +539,66 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
     }
 }
 
+void newRecord(double _time, char _name[25])
+{
+    char name[10][25];
+    double time[10];
+    int counter = 0, num = -1;
+    FILE* in;
+    FILE* out;
+    in = fopen("table.txt", "r");
+    if (!in)
+    {
+        printf("Ошибка при открытии файла\n"); 
+        return;
+    }
+    for (int i = 0 ; i < 10; ++i)
+    {
+        if (!fscanf(in,"%d %s %f", &counter, &*(name[i]), &time[i]))
+        break;
+    }
+    fclose(in);
+    for (int i = 0; i < counter; ++i)
+    {
+        if(_time < time[i])
+        {
+            num = i;
+            break;
+        }
+    }
+    if (num == -1 && counter == 10)
+    {
+        printf("Ваше время медленнее 10-го места списка\n");
+        return;
+    }
+    if (counter == 10)
+    {
+    for(int j = counter-1; j > num; --j)
+    {
+        *(name[j]) = *(name[j-1]);
+        time[j] = time[j-1];
+    }
+    *(name[num]) = *(_name);
+    time[num] = _time;
+    }
+    if (counter != 10)
+    {
+        printf("В разработке\n");
+        return;
+    }
+    out = fopen("table.txt", "w");
+    if (!out)
+    {
+        printf("Ошибка при открытии файла\n"); 
+        return;
+    }
+    for (int i = 0 ; i < counter; ++i)
+    {
+        fprintf(out, "%d. %s %2.1f\n", i+1, name[i], time[i]);
+    }
+    fclose(out);
+}
+
 int main()
 {
     //FILE* in;
@@ -648,16 +708,17 @@ int main()
                     }
                     name[i] = c;
                 }
-                printf("Running time is %2.1f", duration);
+                printf("Running time is %2.1f\n", duration);
+                newRecord(duration, name);
                 getchar();
-                out = fopen("table.txt", "a+");
+                /* out = fopen("table.txt", "a+");
                 if(out == NULL)
                     printf("err\n");
                 else
                 {
                     fprintf(out, "%s %2.1f\n", name, duration);
                     fclose(out);
-                }
+                } */
             }
 
             system("clear");
