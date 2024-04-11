@@ -576,20 +576,49 @@ void newRecord(float _time, char _name[25])
     {
     for(int j = counter-1; j > num; --j)
     {
-        *(name[j]) = *(name[j-1]);
+        for(int i = 0; i < 25; ++i)
+        {
+            name[j][i] = name[j-1][i];
+        }   
         time[j] = time[j-1];
     }
     for(int i = 0; i < 25; ++i)
     {
         name[num][i] = _name[i];
-    }    
-time[num] = _time;
+    }     
+    time[num] = _time;
     }
-    if (counter != 10)
+
+    if(counter != 10)
     {
-        printf("В разработке\n");
-        return;
+        if (num != -1)
+        {
+            for(int j = counter; j > num; --j)
+            {
+                for(int i = 0; i < 25; ++i)
+                {
+                    name[j][i] = name[j-1][i];
+                }   
+                time[j] = time[j-1];
+            }
+            for(int i = 0; i < 25; ++i)
+            {
+                name[num][i] = _name[i];
+            }     
+            time[num] = _time;
+        }
+        else
+        {
+            num = counter;
+            for(int i = 0; i < 25; ++i)
+            {
+                name[num][i] = _name[i];
+            }     
+            time[num] = _time;
+        }
+        counter++;
     }
+
     out = fopen("table.txt", "w");
     if (!out)
     {
