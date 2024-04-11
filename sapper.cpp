@@ -315,7 +315,7 @@ void printPitch(int pitch[20][20], int n, int m)
             if(pitch[i][j] == 0)
             printf("%3s", FLOOR);
 
-            if(pitch[i][j] > 1098)
+            if(pitch[i][j] > 1098 || (pitch[i][j] > 99 && pitch[i][j] < 110))
             printf("%3s", FLAG);
 
             if(pitch[i][j] == 300)
@@ -381,7 +381,8 @@ bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
         break;
 
         case 'm':
-        value += 100;
+        if (value > 1098 || (value > 99 && value < 110)) value -= 100;
+        else value += 100;
         break;
 
         case 'p':
