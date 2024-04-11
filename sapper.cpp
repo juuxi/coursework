@@ -539,10 +539,10 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
     }
 }
 
-void newRecord(double _time, char _name[25])
+void newRecord(float _time, char _name[25])
 {
     char name[10][25];
-    double time[10];
+    float time[10];
     int counter = 0, num = -1;
     FILE* in;
     FILE* out;
@@ -578,8 +578,11 @@ void newRecord(double _time, char _name[25])
         *(name[j]) = *(name[j-1]);
         time[j] = time[j-1];
     }
-    *(name[num]) = *(_name);
-    time[num] = _time;
+    for(int i = 0; i < 25; ++i)
+    {
+        name[num][i] = _name[i];
+    }    
+time[num] = _time;
     }
     if (counter != 10)
     {
@@ -594,7 +597,7 @@ void newRecord(double _time, char _name[25])
     }
     for (int i = 0 ; i < counter; ++i)
     {
-        fprintf(out, "%d. %s %2.1f\n", i+1, name[i], time[i]);
+        fprintf(out, "%d %s %2.1f\n", i+1, name[i], time[i]);
     }
     fclose(out);
 }
@@ -692,7 +695,7 @@ int main()
             bool win = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
             struct timespec end;
             timespec_get(&end, TIME_UTC);
-            double duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+            float duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
 
             if(win)
             {
