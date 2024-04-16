@@ -627,9 +627,32 @@ void newRecord(float _time, char _name[25])
     }
     for (int i = 0 ; i < counter; ++i)
     {
-        fprintf(out, "%d %s %2.1f\n", i+1, name[i], time[i]);
+        fprintf(out, "%d %s %.1f\n", i+1, name[i], time[i]);
     }
     fclose(out);
+}
+
+void getRecord()
+{
+    FILE* in;
+    int counter = 0;
+    char name[10][25];
+    float time[10];
+    in = fopen("table.txt", "r");
+    if (!in)
+    {
+        printf("Ошибка при открытии файла\n"); 
+        getchar();
+        return;
+    }
+    for (int i = 0 ; i < 10; ++i)
+    {
+        if (!fscanf(in,"%d %s %f", &counter, &*(name[i]), &time[i]))
+        break;
+    }
+    fclose(in);
+    for(int i = 0; i < counter; i++)
+        printf("%d %s %.1f\n", i, name[i], time[i]);
 }
 
 int main()
@@ -759,7 +782,7 @@ int main()
             }
             break;
 
-            case 5: printf("Таблица рекордов в разработке\n"); break;
+            case 5: getRecord(); break;
         }
     }
     }
