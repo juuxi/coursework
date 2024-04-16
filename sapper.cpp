@@ -12,7 +12,10 @@ const char CLOSED_FLOOR[] = "\U0001f533";
 const char SMILE[] = "\U0001f610";
 const char FLAG[] = "\U0001f6a9";
 
-#define BOMB_NUM 999
+#define BOMB_NUM_CL 999
+#define BOMB_NUM_OP -1
+#define SMILE_NUM 300
+#define FLOOR_NUM 0
 
 static struct termios oldt;
 
@@ -143,48 +146,60 @@ int symbol_scanning(int overfmax) //эта функция занимается �
     return num;
 }
 
-int symbol_scanning(int overfmax, int overfmin) //эта функция занимается посимвольной читкой введенного числа
+int symbol_scanning(int overfmax, int overfmin) 
 {
     bool inputfailure = false, count = false, r = false, overf = false;
-    int num = 0, counter = 0; //отобрать возможность сразу нажать "энтр"
-    while(true){
-                overf = false;
-                inputfailure = false;
-                char c = '\0';
-                scanf("%c", &c);
-                if (c < '0' || c > '9')   //если прочитанный символ - не цифра, лезем проверять что же это              
+    int num = 0, counter = 0; 
+    while(true)
+    {
+        overf = false;
+        inputfailure = false;
+        char c = '\0';
+        scanf("%c", &c);
+        if (c < '0' || c > '9')        
+        {
+            if (c != '\n') 
+            {
+                printf("Вы ввели неверный символ, повторите попытку\n"); 
+                clean_stdin();
+            } 
+            else 
+            {
+                if(num < overfmin) 
                 {
-                    if (c != '\n') {printf("Вы ввели неверный символ, повторите попытку\n"); clean_stdin();} // если это не перенос строки - кидаем ошибку
-                    else if(counter != 0) 
-                    {
-                        if(num < overfmin) 
-                        {
-                        printf("Число меньше минимального (%d). Повторите попытку\n", overfmin);
-                        num = 0;
-                        clean_stdin();
-                        counter = 0;
-                        }
-                        else
-                        {
-                        count = true; 
-                        break;
-                        }
-                    } //если это перенос строки не первым же символом - все круто, прерываем цикл
-                    else {printf("Вы ввели неверный символ, повторите попытку\n");} //если первым - выдаем ошибку
+                    printf("Число меньше минимального (%d). Повторите попытку\n", overfmin);
+                    inputfailure = true;
+                    num = 0;
+                    counter = 0;
                 }
-                else{
-                if (num*10+c-'0' > overfmax) {overf = true; num = 0; clean_stdin();} 
-                else  
+                else
+                {
+                    count = true; 
+                    break;
+                }
+            } 
+        }
+        else
+        {
+            if (num*10+c-'0' > overfmax) 
+            {
+                overf = true; 
+                inputfailure = true;
+                num = 0; 
+                counter = 0; 
+                clean_stdin();
+            } 
+            else  
                 num = num*10+c-'0';
-                }
+        }
 
-                counter++;
+        if(!inputfailure) counter++;
 
-                if(overf == true) 
-                {
-                printf("Число превысило максимальный размер (%d). Повторите попытку\n", overfmax);
-                counter = 0;
-                }
+        if(overf == true) 
+        {
+            printf("Число превысило максимальный размер (%d). Повторите попытку\n", overfmax);
+            counter = 0;
+        }
     }
     return num;
 }
@@ -193,72 +208,72 @@ void mark_around(int pitch[20][20], int n, int m, int i, int j)
 {
     if(i != n-1 && i != 0 && j != 0 && j != m-1)
     {
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM_CL) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM_CL) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM_CL) pitch[i+1][j-1]++;
     }
 
     if(i == 0 && j == 0)
     {
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
     }
     if(i == n-1 && j == 0)
     {
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
-        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
+        if(pitch[i-1][j+1] != BOMB_NUM_CL) pitch[i-1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
     }
     if(i == n-1 && j == m-1)
     {
-        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
-        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
+        if(pitch[i-1][j-1] != BOMB_NUM_CL) pitch[i-1][j-1]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
     }
     if(i == 0 && j == m-1)
     {
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
     }
 
     if(i == 0 && j != 0 && j != m-1)
     {
-        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM_CL) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
     }
     if(i == n-1 && j != 0 && j != m-1)
     {
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM_CL) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM_CL) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
     }
     if(j == 0 && i != 0 && i != n-1)
     {
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM) pitch[i][j+1]++;
-        if(pitch[i-1][j+1] != BOMB_NUM) pitch[i-1][j+1]++;
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
+        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
+        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
+        if(pitch[i-1][j+1] != BOMB_NUM_CL) pitch[i-1][j+1]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
     }
     if(j == m-1 && i != 0 && i != n-1)
     {
-        if(pitch[i-1][j] != BOMB_NUM) pitch[i-1][j]++;
-        if(pitch[i-1][j-1] != BOMB_NUM) pitch[i-1][j-1]++;
-        if(pitch[i][j-1] != BOMB_NUM) pitch[i][j-1]++;
-        if(pitch[i+1][j-1] != BOMB_NUM) pitch[i+1][j-1]++;
-        if(pitch[i+1][j] != BOMB_NUM) pitch[i+1][j]++;
+        if(pitch[i-1][j] != BOMB_NUM_CL) pitch[i-1][j]++;
+        if(pitch[i-1][j-1] != BOMB_NUM_CL) pitch[i-1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM_CL) pitch[i+1][j-1]++;
+        if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
     }
 }
 
@@ -277,30 +292,13 @@ void creating(int pitch[20][20], int n, int m, int numOfBombs)
     {
         int o = rand() % n;
         int p = rand() % m;
-        if(pitch[o][p] != BOMB_NUM)
+        if(pitch[o][p] != BOMB_NUM_CL)
         {
-            pitch[o][p] = BOMB_NUM;
+            pitch[o][p] = BOMB_NUM_CL;
             mark_around(pitch, n, m, o, p);
             bombCounter++;
         }
     }
-
-    /* for(int i = 0; i < n; i++)
-    {
-        for(int j = 0; j < m; j++)
-        {
-            if(pitch[i][j] > 0)
-            printf("%2d", pitch[i][j]);
-
-            if(pitch[i][j] == -1) 
-            printf("%3s", BOMB);
-
-            if(pitch[i][j] == 0)
-            printf("%3s", FLOOR);
-        }
-        printf("\n");
-    } */
-    //if(err == true) printf("Введен неверный символ\n");
 }
 
 void printPitch(int pitch[20][20], int n, int m)
@@ -309,16 +307,16 @@ void printPitch(int pitch[20][20], int n, int m)
     {
         for(int j = 0; j < m; j++)
         {
-            if(pitch[i][j] == -1) 
+            if(pitch[i][j] == BOMB_NUM_OP) 
             printf("%3s", BOMB);
 
-            if(pitch[i][j] == 0)
+            if(pitch[i][j] == FLOOR_NUM)
             printf("%3s", FLOOR);
 
             if(pitch[i][j] > 1098 || (pitch[i][j] > 99 && pitch[i][j] < 110))
             printf("%3s", FLAG);
 
-            if(pitch[i][j] == 300)
+            if(pitch[i][j] == SMILE_NUM)
             printf("%3s", SMILE);
 
             if(pitch[i][j] > 998 && pitch[i][j] < 1098)
@@ -341,7 +339,7 @@ bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
     preM.x = xSmile;
     preM.y = ySmile;
     int value = pitch[ySmile][xSmile];
-    pitch[ySmile][xSmile] = 300;
+    pitch[ySmile][xSmile] = SMILE_NUM;
     bool endd = false;
     printPitch(pitch, n, m);
     while(true)
@@ -356,28 +354,28 @@ bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
         pitch[ySmile][xSmile] = value;
         if(ySmile != 0) ySmile -= 1;
         value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = 300;
+        pitch[ySmile][xSmile] = SMILE_NUM;
         break;
 
         case 'a':
         pitch[ySmile][xSmile] = value;
         if(xSmile != 0) xSmile -= 1;
         value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = 300;
+        pitch[ySmile][xSmile] = SMILE_NUM;
         break;
 
         case 's':
         pitch[ySmile][xSmile] = value;
         if(ySmile != n-1) ySmile += 1;
         value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = 300;
+        pitch[ySmile][xSmile] = SMILE_NUM;
         break;
 
         case 'd':
         pitch[ySmile][xSmile] = value;
         if(xSmile != m-1) xSmile += 1;
         value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = 300;
+        pitch[ySmile][xSmile] = SMILE_NUM;
         break;
 
         case 'm':
@@ -627,7 +625,7 @@ void newRecord(float _time, char _name[25])
     }
     for (int i = 0 ; i < counter; ++i)
     {
-        fprintf(out, "%d %s %.1f\n", i+1, name[i], time[i]);
+        fprintf(out, "%d %s %2.1f\n", i+1, name[i], time[i]);
     }
     fclose(out);
 }
@@ -652,14 +650,13 @@ void getRecord()
     }
     fclose(in);
     for(int i = 0; i < counter; i++)
-        printf("%d %s %.1f\n", i, name[i], time[i]);
+        printf("%d %s %.1f\n", i+1, name[i], time[i]);
+    printf("\n");
 }
 
 int main()
 {
-    //FILE* in;
-    FILE* out;
-    char buffer_out[100];
+    system("clear");
     char name[25];
     bool isIntoBlock = false;
     int pitch[20][20];
@@ -717,13 +714,13 @@ int main()
         {
             case 1: 
             printf("Введите высоту\n");
-            n = symbol_scanning(20);
+            n = symbol_scanning(20, 5);
             system("clear");
             break;
 
             case 2: 
             printf("Введите длину\n");
-            m = symbol_scanning(20);
+            m = symbol_scanning(20, 5);
             system("clear");
             break;
 
@@ -767,14 +764,6 @@ int main()
                 printf("Running time is %2.1f\n", duration);
                 newRecord(duration, name);
                 getchar();
-                /* out = fopen("table.txt", "a+");
-                if(out == NULL)
-                    printf("err\n");
-                else
-                {
-                    fprintf(out, "%s %2.1f\n", name, duration);
-                    fclose(out);
-                } */
             }
 
             system("clear");
