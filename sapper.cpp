@@ -16,6 +16,9 @@ const char FLAG[] = "\U0001f6a9";
 #define BOMB_NUM_OP -1
 #define SMILE_NUM 300
 #define FLOOR_NUM 0
+#define WIN_END 1
+#define LOSE_END 0
+#define QUIT_END 81
 
 static struct termios oldt;
 
@@ -331,9 +334,9 @@ void printPitch(int pitch[20][20], int n, int m)
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
+int movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
 {
-    bool win = false;
+    int endofmove = LOSE_END;
     preMovement preM;
     int numOfEmpty = m * n;
     preM.x = xSmile;
@@ -344,7 +347,7 @@ bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
     printPitch(pitch, n, m);
     while(true)
     {
-    printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой\n");
+    printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
     disable_waiting_for_enter();
     char movement = getchar();
     restore_terminal_settings();
@@ -394,17 +397,17 @@ bool movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int nu
         if(numOfEmpty == numOfBombs)
         {
             endd = true; 
-            win = true;
+            endofmove = WIN_END;
         }
         break;
 
-        case 10: endd = true; break;
+        case 'Q': endd = true; endofmove = QUIT_END; break;
     }
     system("clear");
     printPitch(pitch, n, m);
     if(endd == true) break;
     }
-    return win;
+    return endofmove;
 }
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
@@ -660,7 +663,7 @@ int main()
     char name[25];
     bool isIntoBlock = false;
     int pitch[20][20];
-    int n = 0, m = 0, pos = 1, numberOfBombs = 0;
+    int n = 0, m = 0, pos = 1, numberOfBombs = 0, endofgame;
     int xSmile = 0, ySmile = 0;
     char menuCatcher, checkArrow;
     int endd[4] = {0, 0, 0, 0};
@@ -742,12 +745,12 @@ int main()
             ySmile = n / 2; xSmile = m / 2;
             struct timespec begin;
             timespec_get(&begin, TIME_UTC);
-            bool win = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
+            endofgame = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
             struct timespec end;
             timespec_get(&end, TIME_UTC);
             float duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
 
-            if(win)
+            if(endofgame == WIN_END)
             {
                 printf("Введите свой псевдоним\n");
                 char c;
@@ -767,7 +770,9 @@ int main()
             }
 
             system("clear");
-            printf("Игра закончена\n\n");
+            if(endofgame == WIN_END) printf("Вы победили!\n\n");
+            if(endofgame == LOSE_END) printf("Вы проиграли\n\n");
+            if(endofgame == QUIT_END) printf("Вы вышли из игры\n\n");
             }
             break;
 
