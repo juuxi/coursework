@@ -544,6 +544,11 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 void newRecord(float _time, char _name[25])
 {
     char name[10][25];
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 25; j++)
+            name[i][j] = 32;
+    }
     float time[10];
     int counter = 0, num = -1;
     FILE* in;
@@ -661,12 +666,12 @@ int main()
 {
     system("clear");
     char name[25];
-    bool isIntoBlock = false;
+    bool isIntoBlock = false, endd = false;
     int pitch[20][20];
     int n = 0, m = 0, pos = 1, numberOfBombs = 0, endofgame;
     int xSmile = 0, ySmile = 0;
     char menuCatcher, checkArrow;
-    int endd[4] = {0, 0, 0, 0};
+    //int endd[4] = {0, 0, 0, 0};
     while(true)
     {
     if (pos == 1) printf("1. Ввод высоты поля <--\n"); else printf("1. Ввод высоты поля\n");
@@ -677,7 +682,7 @@ int main()
     if (pos == 6) printf("6. Выход из программы <--\n"); else printf("6. Выход из программы\n");
     printf ("\nВысота поля = %d Длина поля = %d Число бомб = %d\n\n", n, m, numberOfBombs);
     if(pos != 6) printf ("Выберите пункт меню нажатием стрелочек вверх-вниз или нажатием соответствующей цифры\n");
-    if(pos == 6) break;
+    //if(pos == 6) break;
     disable_waiting_for_enter();
     menuCatcher = getchar();
     restore_terminal_settings();
@@ -754,12 +759,12 @@ int main()
             {
                 printf("Введите свой псевдоним\n");
                 char c;
-                for(int i = 0; i < 25; ++i) //что делать если больше 25
+                for(int i = 0; i < 25; ++i) 
                 {
                     scanf("%c", &c);
                     if(c == '\n') 
                     {
-                        name[i+1] = '\0'; 
+                        name[i] = '\0'; 
                         break;
                     }
                     name[i] = c;
@@ -777,8 +782,11 @@ int main()
             break;
 
             case 5: getRecord(); break;
+            case 6: endd = true; break;
         }
     }
+    isIntoBlock = false;
+    if(endd == true) break;
     }
     return 0;
 }
