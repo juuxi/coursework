@@ -44,6 +44,60 @@ struct coordinates {
     int y;
 };
 
+struct NodeC{
+    char symb;
+    NodeC* next;
+};
+
+struct MyStack{
+    NodeC* first;
+    MyStack()
+    {
+        first = nullptr;
+    }
+
+    NodeC* get_first() 
+    {
+        if(first == nullptr) return nullptr;
+        return first;
+    }
+
+    void remove_first()
+    {
+        if(first == nullptr) return;
+        NodeC* p = first;
+        first = p->next;
+        delete p;
+        p = nullptr;
+    }
+
+    void push_front(char _symb)
+    {
+        if(first == nullptr)
+        {
+            first = new NodeC;
+            first->next = nullptr;
+            first->symb = _symb;
+            return;
+        }
+        NodeC* curr = first;
+        first = new NodeC;
+        first->next = curr;
+        first->symb = _symb;
+    }
+
+    void remove_list()
+    {
+        while(first != nullptr)
+        {
+            NodeC* p = first;
+            first = p->next;
+            delete p;
+            p = nullptr;
+        }
+    }
+};
+
 struct Node{
     coordinates val;
     Node* next;
@@ -392,7 +446,9 @@ int movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int num
         {
             endd = true;
             printf("Нажмите любую клавишу для продолжения\n");
+            disable_waiting_for_enter();
             getchar();
+            restore_terminal_settings();
         }
         if(numOfEmpty == numOfBombs)
         {
