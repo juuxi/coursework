@@ -56,10 +56,16 @@ struct MyStack{
         first = nullptr;
     }
 
-    NodeC* get_first() 
+    void get_all(char movements[20]) 
     {
-        if(first == nullptr) return nullptr;
-        return first;
+        int i = 0;
+        NodeC* curr = first;
+        while(curr != nullptr)
+        {
+            movements[i] = curr->symb;
+            curr = curr->next;
+            i++;
+        }
     }
 
     void remove_first()
@@ -86,7 +92,7 @@ struct MyStack{
         first->symb = _symb;
     }
 
-    void remove_list()
+    void remove_stack()
     {
         while(first != nullptr)
         {
@@ -167,6 +173,8 @@ struct preMovement{
     int y;
     int value;
 };
+
+    MyStack stack;
 
 void clean_stdin(void) //очистка потока ввода, применяется там где без нее scanf начнет читать всякие необработанные символы
 {
@@ -388,80 +396,113 @@ void printPitch(int pitch[20][20], int n, int m)
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-int movingSmile(int pitch[20][20], int n, int m, int ySmile, int xSmile, int numOfBombs)
+int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[20], int& value, bool rev)
 {
     int endofmove = LOSE_END;
     preMovement preM;
-    int numOfEmpty = m * n;
+    int numOfEmpty = m * n, i = 0;
     preM.x = xSmile;
     preM.y = ySmile;
-    int value = pitch[ySmile][xSmile];
+    if(!rev) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
     bool endd = false;
+    if(rev) printf("\n");
     printPitch(pitch, n, m);
     while(true)
     {
-    printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
-    disable_waiting_for_enter();
-    char movement = getchar();
-    restore_terminal_settings();
-    switch(movement)
-    {
-        case 'w': 
-        pitch[ySmile][xSmile] = value;
-        if(ySmile != 0) ySmile -= 1;
-        value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = SMILE_NUM;
-        break;
-
-        case 'a':
-        pitch[ySmile][xSmile] = value;
-        if(xSmile != 0) xSmile -= 1;
-        value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = SMILE_NUM;
-        break;
-
-        case 's':
-        pitch[ySmile][xSmile] = value;
-        if(ySmile != n-1) ySmile += 1;
-        value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = SMILE_NUM;
-        break;
-
-        case 'd':
-        pitch[ySmile][xSmile] = value;
-        if(xSmile != m-1) xSmile += 1;
-        value = pitch[ySmile][xSmile];
-        pitch[ySmile][xSmile] = SMILE_NUM;
-        break;
-
-        case 'm':
-        if (value > 1098 || (value > 99 && value < 110)) value -= 100;
-        else value += 100;
-        break;
-
-        case 'p':
-        digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
-        if(value == 999) 
+        if(!rev) printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
+        char movement;
+        if(!rev)
         {
-            endd = true;
-            printf("Нажмите любую клавишу для продолжения\n");
+            disable_waiting_for_enter();
+            movement = getchar();
+            restore_terminal_settings();
+        }
+        else 
+        {
+            movement = movements[i];
+            switch (movement)
+            {
+                case 'w': movement = 's'; break;
+                case 'a': movement = 'd'; break;
+                case 's': movement = 'w'; break;
+                case 'd': movement = 'a'; break;
+            }
+            i++;
+        }
+
+        if(rev) 
+        {
             disable_waiting_for_enter();
             getchar();
             restore_terminal_settings();
         }
-        if(numOfEmpty == numOfBombs)
-        {
-            endd = true; 
-            endofmove = WIN_END;
-        }
-        break;
 
-        case 'Q': endd = true; endofmove = QUIT_END; break;
-    }
-    system("clear");
-    printPitch(pitch, n, m);
-    if(endd == true) break;
+        switch(movement)
+        {
+            case 'w': 
+            pitch[ySmile][xSmile] = value;
+            if(ySmile != 0) ySmile -= 1;
+            value = pitch[ySmile][xSmile];
+            pitch[ySmile][xSmile] = SMILE_NUM;
+            if(!rev) stack.push_front('w');
+            break;
+
+            case 'a':
+            pitch[ySmile][xSmile] = value;
+            if(xSmile != 0) xSmile -= 1;
+            value = pitch[ySmile][xSmile];
+            pitch[ySmile][xSmile] = SMILE_NUM;
+            if(!rev) stack.push_front('a');
+            break;
+
+            case 's':
+            pitch[ySmile][xSmile] = value;
+            if(ySmile != n-1) ySmile += 1;
+            value = pitch[ySmile][xSmile];
+            pitch[ySmile][xSmile] = SMILE_NUM;
+            if(!rev) stack.push_front('s');
+            break;
+
+            case 'd':
+            pitch[ySmile][xSmile] = value;
+            if(xSmile != m-1) xSmile += 1;
+            value = pitch[ySmile][xSmile];
+            pitch[ySmile][xSmile] = SMILE_NUM;
+            if(!rev) stack.push_front('d');
+            break;
+
+            case 'm':
+            if (value > 1098 || (value > 99 && value < 110)) value -= 100;
+            else value += 100;
+            if(!rev) stack.push_front('m');
+            break;
+
+            case 'p':
+            digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+            if(value == 999) 
+            {
+                endd = true;
+                printf("Нажмите любую клавишу для продолжения\n");
+                disable_waiting_for_enter();
+                getchar();
+                restore_terminal_settings();
+            }
+            if(numOfEmpty == numOfBombs)
+            {
+                endd = true; 
+                endofmove = WIN_END;
+            }
+            if(!rev) stack.push_front('p');
+            break;
+
+            case 'Q': endd = true; endofmove = QUIT_END; break;
+        }
+        system("clear");
+        printPitch(pitch, n, m);
+        if(movements[i] == '\0' && rev) break;
+        if(endd == true) 
+            break;
     }
     return endofmove;
 }
@@ -722,9 +763,12 @@ int main()
 {
     system("clear");
     char name[25];
+    char movements[20];
+    for(int i = 0; i < 20; i++)
+        movements[i] = '\0';
     bool isIntoBlock = false, endd = false;
     int pitch[20][20];
-    int n = 0, m = 0, pos = 1, numberOfBombs = 0, endofgame;
+    int n = 0, m = 0, pos = 1, numberOfBombs = 0, endofgame, value = 0;
     int xSmile = 0, ySmile = 0;
     char menuCatcher, checkArrow;
     //int endd[4] = {0, 0, 0, 0};
@@ -802,38 +846,61 @@ int main()
             if(!n || !m || !numberOfBombs) printf("Сначала введите высоту, длину и число бомб\n\n");
             else 
             {
-            creating(pitch, n, m, numberOfBombs);
-            ySmile = n / 2; xSmile = m / 2;
-            struct timespec begin;
-            timespec_get(&begin, TIME_UTC);
-            endofgame = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs);
-            struct timespec end;
-            timespec_get(&end, TIME_UTC);
-            float duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+                creating(pitch, n, m, numberOfBombs);
+                ySmile = n / 2; xSmile = m / 2;
+                struct timespec begin;
+                timespec_get(&begin, TIME_UTC);
+                endofgame = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, movements, value, false);
+                struct timespec end;
+                timespec_get(&end, TIME_UTC);
+                float duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
 
-            if(endofgame == WIN_END)
-            {
-                printf("Введите свой псевдоним\n");
-                char c;
-                for(int i = 0; i < 25; ++i) 
+                if(endofgame == WIN_END)
                 {
-                    scanf("%c", &c);
-                    if(c == '\n') 
+                    printf("Введите свой псевдоним\n");
+                    char c;
+                    for(int i = 0; i < 25; ++i) 
                     {
-                        name[i] = '\0'; 
+                        scanf("%c", &c);
+                        if(c == '\n') 
+                        {
+                            name[i] = '\0'; 
+                            break;
+                        }
+                        name[i] = c;
+                    }
+                    printf("Running time is %2.1f\n", duration);
+                    newRecord(duration, name);
+                    getchar();
+                }
+
+                system("clear");
+                if(endofgame == WIN_END) printf("Вы победили!\n\n");
+                if(endofgame == LOSE_END) printf("Вы проиграли\n\n");
+                if(endofgame == QUIT_END) printf("Вы вышли из игры\n\n");
+                char rev = '\0';
+                while(rev != 'y' && rev != 'n')
+                {
+                    printf("Хотите ли вы посмотреть запись игры [y/n]? ");
+                    disable_waiting_for_enter();
+                    rev = getchar();
+                    restore_terminal_settings();
+                    if (rev == 'y') 
+                    {
+                        stack.get_all(movements);
+                        movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, movements, value, true);
+                        disable_waiting_for_enter();
+                        getchar();
+                        restore_terminal_settings();
+                        system("clear");
+                    }
+                    if (rev == 'n') 
+                    {
+                        stack.remove_stack();
                         break;
                     }
-                    name[i] = c;
+                    printf("\n");
                 }
-                printf("Running time is %2.1f\n", duration);
-                newRecord(duration, name);
-                getchar();
-            }
-
-            system("clear");
-            if(endofgame == WIN_END) printf("Вы победили!\n\n");
-            if(endofgame == LOSE_END) printf("Вы проиграли\n\n");
-            if(endofgame == QUIT_END) printf("Вы вышли из игры\n\n");
             }
             break;
 
@@ -844,5 +911,6 @@ int main()
     isIntoBlock = false;
     if(endd == true) break;
     }
+    stack.remove_stack();
     return 0;
 }
