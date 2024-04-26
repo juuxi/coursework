@@ -56,7 +56,7 @@ struct MyStack{
         first = nullptr;
     }
 
-    void get_all(char movements[20]) 
+    void get_all(char movements[40]) 
     {
         int i = 0;
         NodeC* curr = first;
@@ -396,23 +396,23 @@ void printPitch(int pitch[20][20], int n, int m)
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[20], int& value, bool rev)
+int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[40], int& value, bool reverse)
 {
     int endofmove = LOSE_END;
     preMovement preM;
     int numOfEmpty = m * n, i = 0;
     preM.x = xSmile;
     preM.y = ySmile;
-    if(!rev) value = pitch[ySmile][xSmile];
+    if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
     bool endd = false;
-    if(rev) printf("\n");
+    if(reverse) printf("\n");
     printPitch(pitch, n, m);
     while(true)
     {
-        if(!rev) printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
+        if(!reverse) printf("Нажимайте клавиши w, a, s, d для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
         char movement;
-        if(!rev)
+        if(!reverse)
         {
             disable_waiting_for_enter();
             movement = getchar();
@@ -421,6 +421,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
         else 
         {
             movement = movements[i];
+            
             switch (movement)
             {
                 case 'w': movement = 's'; break;
@@ -431,7 +432,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             i++;
         }
 
-        if(rev) 
+        if(reverse) 
         {
             disable_waiting_for_enter();
             getchar();
@@ -445,7 +446,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(ySmile != 0) ySmile -= 1;
             value = pitch[ySmile][xSmile];
             pitch[ySmile][xSmile] = SMILE_NUM;
-            if(!rev) stack.push_front('w');
+            if(!reverse) stack.push_front('w');
             break;
 
             case 'a':
@@ -453,7 +454,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(xSmile != 0) xSmile -= 1;
             value = pitch[ySmile][xSmile];
             pitch[ySmile][xSmile] = SMILE_NUM;
-            if(!rev) stack.push_front('a');
+            if(!reverse) stack.push_front('a');
             break;
 
             case 's':
@@ -461,7 +462,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(ySmile != n-1) ySmile += 1;
             value = pitch[ySmile][xSmile];
             pitch[ySmile][xSmile] = SMILE_NUM;
-            if(!rev) stack.push_front('s');
+            if(!reverse) stack.push_front('s');
             break;
 
             case 'd':
@@ -469,13 +470,13 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(xSmile != m-1) xSmile += 1;
             value = pitch[ySmile][xSmile];
             pitch[ySmile][xSmile] = SMILE_NUM;
-            if(!rev) stack.push_front('d');
+            if(!reverse) stack.push_front('d');
             break;
 
             case 'm':
             if (value > 1098 || (value > 99 && value < 110)) value -= 100;
             else value += 100;
-            if(!rev) stack.push_front('m');
+            if(!reverse) stack.push_front('m');
             break;
 
             case 'p':
@@ -493,14 +494,14 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 endd = true; 
                 endofmove = WIN_END;
             }
-            if(!rev) stack.push_front('p');
+            if(!reverse) stack.push_front('p');
             break;
 
             case 'Q': endd = true; endofmove = QUIT_END; break;
         }
         system("clear");
         printPitch(pitch, n, m);
-        if(movements[i] == '\0' && rev) break;
+        if(movements[i] == '\0' && reverse) break;
         if(endd == true) 
             break;
     }
@@ -763,8 +764,8 @@ int main()
 {
     system("clear");
     char name[25];
-    char movements[20];
-    for(int i = 0; i < 20; i++)
+    char movements[40];
+    for(int i = 0; i < 40; i++)
         movements[i] = '\0';
     bool isIntoBlock = false, endd = false;
     int pitch[20][20];
@@ -878,23 +879,29 @@ int main()
                 if(endofgame == WIN_END) printf("Вы победили!\n\n");
                 if(endofgame == LOSE_END) printf("Вы проиграли\n\n");
                 if(endofgame == QUIT_END) printf("Вы вышли из игры\n\n");
-                char rev = '\0';
-                while(rev != 'y' && rev != 'n')
+                char reverse = '\0';
+                while(reverse != 'y' && reverse != 'n')
                 {
                     printf("Хотите ли вы посмотреть запись игры [y/n]? ");
                     disable_waiting_for_enter();
-                    rev = getchar();
+                    reverse = getchar();
                     restore_terminal_settings();
-                    if (rev == 'y') 
+                    if (reverse == 'y') 
                     {
                         stack.get_all(movements);
                         movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, movements, value, true);
-                        disable_waiting_for_enter();
-                        getchar();
-                        restore_terminal_settings();
+                        printf("Просмотр перемотки завершен нажмите Q для выхода в меню\n");
+                        char endOfReverse = '\0';
+                        while(endOfReverse != 'Q')
+                        {
+                            disable_waiting_for_enter();
+                            endOfReverse = getchar();
+                            restore_terminal_settings();
+                        }
                         system("clear");
+                        stack.remove_stack();
                     }
-                    if (rev == 'n') 
+                    if (reverse == 'n') 
                     {
                         stack.remove_stack();
                         break;
