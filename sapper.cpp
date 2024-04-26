@@ -395,6 +395,7 @@ void printPitch(int pitch[20][20], int n, int m)
 }
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
+void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
 int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[40], int& value, bool reverse)
 {
@@ -480,21 +481,25 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             break;
 
             case 'p':
-            digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
-            if(value == 999) 
+            if(!reverse)
             {
-                endd = true;
-                printf("Нажмите любую клавишу для продолжения\n");
-                disable_waiting_for_enter();
-                getchar();
-                restore_terminal_settings();
+                digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+                if(value == 999) 
+                {
+                    endd = true;
+                    printf("Нажмите любую клавишу для продолжения\n");
+                    disable_waiting_for_enter();
+                    getchar();
+                    restore_terminal_settings();
+                }
+                if(numOfEmpty == numOfBombs)
+                {
+                    endd = true; 
+                    endofmove = WIN_END;
+                }
+                stack.push_front('p');
             }
-            if(numOfEmpty == numOfBombs)
-            {
-                endd = true; 
-                endofmove = WIN_END;
-            }
-            if(!reverse) stack.push_front('p');
+            else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
             break;
 
             case 'Q': endd = true; endofmove = QUIT_END; break;
@@ -637,6 +642,15 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
         value -= 1100;
         numOfEmpty--;
     }
+}
+
+void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
+{
+    if(value > 0 && value < 10)
+    {
+        value +=1000;
+        numOfEmpty++;
+    }  
 }
 
 void newRecord(float _time, char _name[25])
