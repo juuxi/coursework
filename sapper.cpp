@@ -435,9 +435,21 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
 
         if(reverse) 
         {
-            disable_waiting_for_enter();
-            getchar();
-            restore_terminal_settings();
+            printf("Для продолжения нажмите стрелочку влево\n");
+            while(true)
+            {
+                char checkerArrow = '\0';
+                disable_waiting_for_enter();
+                checkerArrow = getchar();
+                restore_terminal_settings();
+                if(checkerArrow == 27)
+                {
+                    getchar();
+                    checkerArrow = getchar();
+                    if (checkerArrow == 'D')
+                        break;
+                }
+            }
         }
 
         switch(movement)
