@@ -650,8 +650,108 @@ void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int
     {
         value +=1000;
         numOfEmpty++;
-    }  
-}
+    }
+    if(value == 0 || value == 100)
+    {
+        MyList list;
+        coordinates coord;
+        coord.y = ySmile;
+        coord.x = xSmile;
+        list.push_back(coord);
+        Node* checker;
+        if(value == 0) value += 1000;
+        if(value == 100) value += 1000;
+        numOfEmpty--;
+        int toCheck = 4;
+        int nChecker = 0;
+        while(true)
+        {
+            for(int i = 0; i < toCheck; ++i)
+            {
+                checker = list.get_first();
+                if(checker != nullptr)
+                {                    
+                    if(checker->val.y != 0)
+                    {
+                    if(pitch[checker->val.y-1][checker->val.x] == 0)
+                    {
+                        pitch[checker->val.y-1][checker->val.x] += 1000;
+                        numOfEmpty--;
+                        coord.y = checker->val.y-1;
+                        coord.x = checker->val.x;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y-1][checker->val.x] > 0 && pitch[checker->val.y-1][checker->val.x] < 10)
+                    {
+                        pitch[checker->val.y-1][checker->val.x] += 1000;
+                        numOfEmpty--;
+                    }
+                    }
+
+                    if(checker->val.y != n - 1)
+                    {
+                    if(pitch[checker->val.y+1][checker->val.x] == 0)
+                    {
+                        pitch[checker->val.y+1][checker->val.x] += 1000;
+                        numOfEmpty--;
+                        coord.y = checker->val.y+1;
+                        coord.x = checker->val.x;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y+1][checker->val.x] > 0 && pitch[checker->val.y+1][checker->val.x] < 10)
+                    {
+                        pitch[checker->val.y+1][checker->val.x] += 1000;
+                        numOfEmpty--;
+                    }
+                    }
+
+                    if(checker->val.x != 0)
+                    {
+                    if(pitch[checker->val.y][checker->val.x-1] == 0)
+                    {
+                        pitch[checker->val.y][checker->val.x-1] += 1000;
+                        numOfEmpty--;
+                        coord.y = checker->val.y;
+                        coord.x = checker->val.x-1;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y][checker->val.x-1] > 0 && pitch[checker->val.y][checker->val.x-1] < 10)
+                    {
+                        pitch[checker->val.y][checker->val.x-1] += 1000;
+                        numOfEmpty--;
+                    }
+                    }
+
+                    if(checker->val.x != m - 1)
+                    {
+                    if(pitch[checker->val.y][checker->val.x+1] == 0)
+                    {
+                        pitch[checker->val.y][checker->val.x+1] += 1000;
+                        numOfEmpty--;
+                        coord.y = checker->val.y;
+                        coord.x = checker->val.x+1;
+                        list.push_back(coord);
+                        nChecker++;
+                    }
+                    if(pitch[checker->val.y][checker->val.x+1] > 0 && pitch[checker->val.y][checker->val.x+1] < 10)
+                    {
+                        pitch[checker->val.y][checker->val.x+1] += 1000;
+                        numOfEmpty--;
+                    }
+                    }
+
+                    list.remove_first();
+                }
+            }
+            if(nChecker == 0) break;
+            else toCheck = nChecker;
+            nChecker = 0;
+        }
+    }
+}  
 
 void newRecord(float _time, char _name[25])
 {
