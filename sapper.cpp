@@ -646,6 +646,16 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 
 void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
 {
+    if(value == 999 || value == 1099)
+    {
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = 0; j < m; j++)
+                if(pitch[i][j] > -2 && pitch[i][j] < 200) pitch[i][j] += 1000;
+        }
+        pitch[ySmile][xSmile] = SMILE_NUM;
+    }
+
     if(value > 0 && value < 10)
     {
         value +=1000;
@@ -1018,6 +1028,7 @@ int main()
                     if (reverse == 'n') 
                     {
                         stack.remove_stack();
+                        printf("\n");
                         break;
                     }
                     printf("\n");
