@@ -514,6 +514,8 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             case 'p':
             if(!reverse)
             {
+                if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
+                    stack.push_front('p');
                 digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
                 if(value == 999) 
                 {
@@ -528,7 +530,6 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     endd = true; 
                     endofmove = WIN_END;
                 }
-                stack.push_front('p');
             }
             else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
             break;
@@ -677,7 +678,7 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 
 void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
 {
-    if(value == 999 || value == 1099)
+    if(value == 999 || value == 1099) //повторное копание запускает лишний поиск в ширину, в случае поражения работа некорректна
     {
         for(int i = 0; i < n; ++i)
         {
