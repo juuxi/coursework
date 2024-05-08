@@ -58,16 +58,23 @@ struct MyStack{
         first = nullptr;
     }
 
-    void get_all(char movements[REVERSE_CAPACITY]) 
+    void get_all() 
     {
         int i = 0;
         NodeC* curr = first;
+        FILE* out;
+        out = fopen("Recording.txt", "w");
+        if (!out)
+        {
+            printf("Ошибка при открытии файла\n"); 
+            return;
+        }
         while(curr != nullptr)
         {
-            movements[i] = curr->symb;
+            fprintf(out, "%c", curr->symb);
             curr = curr->next;
-            i++;
         }
+        fclose(out);
     }
 
     void remove_first()
@@ -399,8 +406,15 @@ void printPitch(int pitch[20][20], int n, int m)
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[REVERSE_CAPACITY], int& value, bool reverse)
+int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, int& value, bool reverse)
 {
+    FILE* in;
+    in = fopen("Recording.txt", "r");
+    if (!in && reverse)
+    {
+        printf("Ошибка при открытии файла\n"); 
+        return -56;
+    }
     int endofmove = LOSE_END;
     preMovement preM;
     int numOfEmpty = m * n, i = 0;
@@ -423,7 +437,11 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
         }
         else 
         {
-            movement = movements[i];
+            if (fscanf(in, "%c", &movement) == EOF) 
+            {
+                fclose(in);
+                break;    
+            }      
             
             switch (movement)
             {
@@ -432,7 +450,6 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 case 's': movement = 'w'; break;
                 case 'd': movement = 'a'; break;
             }
-            i++;
         }
 
         if(reverse) 
@@ -520,7 +537,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
         }
         system("clear");
         printPitch(pitch, n, m);
-        if(movements[i] == '\0' && reverse) break;
+        if(movement == '\0' && reverse) break;
         if(endd == true) 
             break;
     }
@@ -910,7 +927,6 @@ int main()
     int n = 0, m = 0, pos = 1, numberOfBombs = 0, endofgame, value = 0;
     int xSmile = 0, ySmile = 0;
     char menuCatcher, checkArrow;
-    //int endd[4] = {0, 0, 0, 0};
     while(true)
     {
     if (pos == 1) printf("1. Ввод высоты поля <--\n"); else printf("1. Ввод высоты поля\n");
@@ -921,7 +937,6 @@ int main()
     if (pos == 6) printf("6. Выход из программы <--\n"); else printf("6. Выход из программы\n");
     printf ("\nВысота поля = %d Длина поля = %d Число бомб = %d\n\n", n, m, numberOfBombs);
     if(pos != 6) printf ("Выберите пункт меню нажатием стрелочек вверх-вниз или нажатием соответствующей цифры\n");
-    //if(pos == 6) break;
     disable_waiting_for_enter();
     menuCatcher = getchar();
     restore_terminal_settings();
@@ -989,7 +1004,7 @@ int main()
                 ySmile = n / 2; xSmile = m / 2;
                 struct timespec begin;
                 timespec_get(&begin, TIME_UTC);
-                endofgame = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, movements, value, false);
+                endofgame = movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, value, false);
                 struct timespec end;
                 timespec_get(&end, TIME_UTC);
                 float duration = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
@@ -1026,8 +1041,8 @@ int main()
                     restore_terminal_settings();
                     if (reverse == 'y') 
                     {
-                        stack.get_all(movements);
-                        movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, movements, value, true);
+                        stack.get_all();
+                        movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, value, true);
                         printf("Просмотр перемотки завершен нажмите Q для выхода в меню\n");
                         char endOfReverse = '\0';
                         while(endOfReverse != 'Q')
