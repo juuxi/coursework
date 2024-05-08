@@ -467,6 +467,13 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     checkerArrow = getchar();
                     if (checkerArrow == 'D')
                         break;
+                    if (checkerArrow == 'C')
+                    {
+                        fseek(in, -2, SEEK_CUR);
+                        fscanf(in, "%c", &movement);
+                        fseek(in, -1, SEEK_CUR);
+                        break;
+                    }
                 }
             }
         }
