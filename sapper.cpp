@@ -20,6 +20,8 @@ const char FLAG[] = "\U0001f6a9";
 #define LOSE_END 0
 #define QUIT_END 81
 
+#define REVERSE_CAPACITY 60
+
 static struct termios oldt;
 
 void restore_terminal_settings(void)
@@ -56,7 +58,7 @@ struct MyStack{
         first = nullptr;
     }
 
-    void get_all(char movements[40]) 
+    void get_all(char movements[REVERSE_CAPACITY]) 
     {
         int i = 0;
         NodeC* curr = first;
@@ -397,7 +399,7 @@ void printPitch(int pitch[20][20], int n, int m)
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
 
-int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[40], int& value, bool reverse)
+int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, char movements[REVERSE_CAPACITY], int& value, bool reverse)
 {
     int endofmove = LOSE_END;
     preMovement preM;
@@ -900,8 +902,8 @@ int main()
 {
     system("clear");
     char name[25];
-    char movements[40];
-    for(int i = 0; i < 40; i++)
+    char movements[REVERSE_CAPACITY];
+    for(int i = 0; i < REVERSE_CAPACITY; i++)
         movements[i] = '\0';
     bool isIntoBlock = false, endd = false;
     int pitch[20][20];
