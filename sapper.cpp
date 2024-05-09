@@ -435,47 +435,43 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             movement = getchar();
             restore_terminal_settings();
         }
-        else 
-        {
-            if (fscanf(in, "%c", &movement) == EOF) 
-            {
-                fclose(in);
-                break;    
-            }      
-            
-            switch (movement)
-            {
-                case 'w': movement = 's'; break;
-                case 'a': movement = 'd'; break;
-                case 's': movement = 'w'; break;
-                case 'd': movement = 'a'; break;
-            }
-        }
 
         if(reverse) 
         {
-            printf("Для продолжения нажмите стрелочку влево\n");
-            while(true)
+            printf("Для перемотки нажмите стрелочки влево и вправо, движение доступно на wasd\nДля выхода нажмите Q\n");
+            char checkerArrow = '\0';
+            disable_waiting_for_enter();
+            checkerArrow = getchar();
+            restore_terminal_settings();
+            if(checkerArrow == 27)
             {
-                char checkerArrow = '\0';
-                disable_waiting_for_enter();
+                getchar();
                 checkerArrow = getchar();
-                restore_terminal_settings();
-                if(checkerArrow == 27)
+                if (checkerArrow == 'D')
                 {
-                    getchar();
-                    checkerArrow = getchar();
-                    if (checkerArrow == 'D')
-                        break;
-                    if (checkerArrow == 'C')
+                    if (fscanf(in, "%c", &movement) == EOF) 
                     {
-                        fseek(in, -2, SEEK_CUR);
-                        fscanf(in, "%c", &movement);
-                        fseek(in, -1, SEEK_CUR);
+                        fclose(in);
                         break;
+                    }      
+                    
+                    switch (movement)
+                    {
+                        case 'w': movement = 's'; break;
+                        case 'a': movement = 'd'; break;
+                        case 's': movement = 'w'; break;
+                        case 'd': movement = 'a'; break;
                     }
                 }
+                if (checkerArrow == 'C')
+                {
+                    fseek(in, -1, SEEK_CUR);
+                    fscanf(in, "%c", &movement);
+                    fseek(in, -1, SEEK_CUR);
+                }
             }
+            else 
+                movement = checkerArrow;
         }
 
         switch(movement)
