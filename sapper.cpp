@@ -408,7 +408,7 @@ void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int
 
 int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, int& value, bool reverse)
 {
-    FILE* in;
+    FILE* in; //note: markaround sometimes works inproperly in corners
     in = fopen("Recording.txt", "r");
     if (!in && reverse)
     {
@@ -552,6 +552,20 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 {
     if(value == 999 || value == 1099)
     {
+        FILE* out;
+        out = fopen("Pitch.txt", "w");
+        if (!out)
+        {
+            printf("Ошибка при открытии файла\n"); 
+            return;
+        }
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < m; j++)
+                fprintf(out, "%5d", pitch[i][j]);
+                fprintf(out, "\n");
+        }
+        fclose(out);
         pitch[ySmile][xSmile] = value;
         for(int i = 0; i < n; ++i)
         {
@@ -681,14 +695,22 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
 
 void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
 {
-    if(value == 999 || value == 1099) //повторное копание запускает лишний поиск в ширину, в случае поражения работа некорректна
+    if(value == 999 || value == 1099) 
     {
-        for(int i = 0; i < n; ++i)
+        FILE* in;
+        in = fopen("Pitch.txt", "r");
+        if (!in)
+        {
+            printf("Ошибка при открытии файла\n"); 
+            return;
+        }
+        for(int i = 0; i < n; i++)
         {
             for(int j = 0; j < m; j++)
-                if(pitch[i][j] > -2 && pitch[i][j] < 200) pitch[i][j] += 1000;
+                fscanf(in, "%5d", &pitch[i][j]);
+            fscanf(in, "\n");
         }
-        pitch[ySmile][xSmile] = SMILE_NUM;
+        fclose(in);
     }
 
     if(value > 0 && value < 10)
