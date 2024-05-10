@@ -313,8 +313,8 @@ void mark_around(int pitch[20][20], int n, int m, int i, int j)
     if(i == 0 && j == m-1)
     {
         if(pitch[i+1][j] != BOMB_NUM_CL) pitch[i+1][j]++;
-        if(pitch[i+1][j+1] != BOMB_NUM_CL) pitch[i+1][j+1]++;
-        if(pitch[i][j+1] != BOMB_NUM_CL) pitch[i][j+1]++;
+        if(pitch[i+1][j-1] != BOMB_NUM_CL) pitch[i+1][j-1]++;
+        if(pitch[i][j-1] != BOMB_NUM_CL) pitch[i][j-1]++;
     }
 
     if(i == 0 && j != 0 && j != m-1)
@@ -422,7 +422,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     preM.y = ySmile;
     if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
-    bool endd = false, reverseMoving = false;
+    bool endd = false, reverseMoving = false, reverseDigging = false;
     if(reverse) printf("\n");
     printPitch(pitch, n, m);
     while(true)
@@ -512,6 +512,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     fseek(in, -1, SEEK_CUR);
                     fscanf(in, "%c", &movement);
                     fseek(in, -1, SEEK_CUR);
+                    reverseDigging = true;
                 }
             }
             else 
@@ -582,7 +583,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             break;
 
             case 'p':
-            if(!reverse)
+            if(!reverse || reverseDigging)
             {
                 if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
                     stack.push_front('p');
@@ -602,6 +603,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 }
             }
             else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+            reverseDigging = false;
             break;
 
             case 'Q': endd = true; endofmove = QUIT_END; break;
