@@ -422,7 +422,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     preM.y = ySmile;
     if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
-    bool endd = false;
+    bool endd = false, reverseMoving = false;
     if(reverse) printf("\n");
     printPitch(pitch, n, m);
     while(true)
@@ -449,6 +449,28 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 checkerArrow = getchar();
                 if (checkerArrow == 'D')
                 {
+                    if (reverseMoving == true)
+                    {
+                        FILE* inPitch;
+                        inPitch = fopen("Pitch.txt", "r");
+                        if (!inPitch)
+                        {
+                            printf("Ошибка при открытии файла\n"); 
+                            return -56;
+                        }
+                        fscanf(inPitch, "%d ", &xSmile);
+                        fscanf(inPitch, "%d ", &ySmile);
+                        fscanf(inPitch, "\n");
+                        for(int i = 0; i < n; i++)
+                        {
+                            for(int j = 0; j < m; j++)
+                                fscanf(inPitch, "%5d", &pitch[i][j]);
+                            fscanf(inPitch, "\n");
+                        }
+                        fclose(inPitch);
+                        reverseMoving = false;
+                    }
+
                     if (fscanf(in, "%c", &movement) == EOF) 
                     {
                         fclose(in);
@@ -465,13 +487,58 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 }
                 if (checkerArrow == 'C')
                 {
+                    if (reverseMoving == true)
+                    {
+                        FILE* inPitch;
+                        inPitch = fopen("Pitch.txt", "r");
+                        if (!inPitch)
+                        {
+                            printf("Ошибка при открытии файла\n"); 
+                            return -56;
+                        }
+                        fscanf(inPitch, "%d ", &xSmile);
+                        fscanf(inPitch, "%d ", &ySmile);
+                        fscanf(inPitch, "\n");
+                        for(int i = 0; i < n; i++)
+                        {
+                            for(int j = 0; j < m; j++)
+                                fscanf(inPitch, "%5d", &pitch[i][j]);
+                            fscanf(inPitch, "\n");
+                        }
+                        fclose(inPitch);
+                        reverseMoving = false;
+                    }
+
                     fseek(in, -1, SEEK_CUR);
                     fscanf(in, "%c", &movement);
                     fseek(in, -1, SEEK_CUR);
                 }
             }
             else 
+            {
                 movement = checkerArrow;
+                if (!reverseMoving)
+                {
+                FILE* outPitch;
+                outPitch = fopen("Pitch.txt", "w");
+                if (!outPitch)
+                {
+                    printf("Ошибка при открытии файла\n"); 
+                    return -56;
+                }
+                fprintf(outPitch, "%d ", xSmile);
+                fprintf(outPitch, "%d ", ySmile);
+                fprintf(outPitch, "\n");
+                for(int i = 0; i < n; i++)
+                {
+                    for(int j = 0; j < m; j++)
+                        fprintf(outPitch, "%5d", pitch[i][j]);
+                        fprintf(outPitch, "\n");
+                }
+                fclose(outPitch);
+                }
+                reverseMoving = true;
+            }
         }
 
         switch(movement)
