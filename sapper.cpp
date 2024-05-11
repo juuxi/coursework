@@ -422,7 +422,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     preM.y = ySmile;
     if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
-    bool endd = false, reverseMoving = false, noWayReverse = false;
+    bool endd = false, reverseMoving = false, noWayReverse = false, reverseDigging = false;
     if(reverse) printf("\n");
     printPitch(pitch, n, m);
     while(true)
@@ -514,6 +514,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 {
                     fscanf(in, "%c", &movement); 
                     fseek(in, -1, SEEK_CUR);
+                    reverseDigging = true;
                 }
             }
             if(checkerArrow != 'a' && checkerArrow != 'd')
@@ -588,7 +589,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             break;
 
             case 'b':
-            if(!reverse)
+            if(!reverse || reverseDigging)
             {
                 if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
                     stack.push_front('b');
@@ -610,6 +611,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 }
             }
             else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+            reverseDigging = false;
             break;
 
             case 'Q': 
