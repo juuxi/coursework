@@ -422,12 +422,12 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     preM.y = ySmile;
     if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
-    bool endd = false, reverseMoving = false, reverseDigging = false;
+    bool endd = false, reverseMoving = false, noWayReverse = false;
     if(reverse) printf("\n");
     printPitch(pitch, n, m);
     while(true)
     {
-        if(!reverse) printf("Нажимайте стрелочки для управления смайликом и p чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
+        if(!reverse) printf("Нажимайте стрелочки для управления смайликом и b чтобы открыть поле под собой.\nДля выхода нажмите Q\n");
         char movement;
         if(!reverse)
         {
@@ -469,8 +469,8 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
 
                 if (fscanf(in, "%c", &movement) == EOF) 
                 {
-                    fclose(in);
-                    break;
+                    noWayReverse = true;
+                    movement = '\0';
                 }      
                 
                 switch (movement)
@@ -505,10 +505,16 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     reverseMoving = false;
                 }
 
-                fseek(in, -1, SEEK_CUR);
-                fscanf(in, "%c", &movement);
-                fseek(in, -1, SEEK_CUR);
-                reverseDigging = true;
+                if(fseek(in, -1, SEEK_CUR) == EOF)
+                {
+                    noWayReverse = true;
+                    movement = '\0';
+                }
+                else 
+                {
+                    fscanf(in, "%c", &movement); 
+                    fseek(in, -1, SEEK_CUR);
+                }
             }
             if(checkerArrow != 'a' && checkerArrow != 'd')
             {
@@ -581,15 +587,16 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(!reverse) stack.push_front('m');
             break;
 
-            case 'p':
-            if(!reverse || reverseDigging)
+            case 'b':
+            if(!reverse)
             {
                 if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
-                    stack.push_front('p');
+                    stack.push_front('b');
                 digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
                 if(value == 999) 
                 {
                     endd = true;
+                    fclose(in);
                     printf("Нажмите любую клавишу для продолжения\n");
                     disable_waiting_for_enter();
                     getchar();
@@ -598,18 +605,23 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                 if(numOfEmpty == numOfBombs)
                 {
                     endd = true; 
+                    fclose(in);                     
                     endofmove = WIN_END;
                 }
             }
             else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
-            reverseDigging = false;
             break;
 
-            case 'Q': endd = true; endofmove = QUIT_END; break;
+            case 'Q': 
+            endd = true; endofmove = QUIT_END; 
+            fclose(in);
+            break;
         }
         system("clear");
+        if (noWayReverse) printf("Смещение в этом направлении невозможно\n");
+        noWayReverse = false;
         printPitch(pitch, n, m);
-        if(movement == '\0' && reverse) break;
+        //if(movement == '\0' && reverse) break;
         if(endd == true) 
             break;
     }
@@ -1136,20 +1148,14 @@ int main()
                     if (reverse == 'y') 
                     {
                         stack.get_all();
+                        system("clear");
                         movingSmile(pitch, n, m, ySmile, xSmile, numberOfBombs, value, true);
-                        printf("Просмотр перемотки завершен нажмите Q для выхода в меню\n");
-                        char endOfReverse = '\0';
-                        while(endOfReverse != 'Q')
-                        {
-                            disable_waiting_for_enter();
-                            endOfReverse = getchar();
-                            restore_terminal_settings();
-                        }
                         system("clear");
                         stack.remove_stack();
                     }
                     if (reverse == 'n') 
                     {
+                        system("clear");
                         stack.remove_stack();
                         printf("\n");
                         break;
