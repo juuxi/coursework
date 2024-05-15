@@ -403,7 +403,7 @@ void printPitch(int pitch[20][20], int n, int m)
     }
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse);
 void diggingReverse(int pitch[20][20], int n, int m, int &ySmile, int &xSmile, int &value, int &numOfEmpty, int &wasvalue);
 
 int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, int& value, bool reverse)
@@ -449,6 +449,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             {
                 if (reverseMoving == true)
                 {
+                    value = wasvalue;
                     FILE* inPitch;
                     inPitch = fopen("Pitch.txt", "r");
                     if (!inPitch)
@@ -488,6 +489,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             {
                 if (reverseMoving == true)
                 {
+                    value = wasvalue;
                     FILE* inPitch;
                     inPitch = fopen("Pitch.txt", "r");
                     if (!inPitch)
@@ -542,6 +544,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                         fprintf(outPitch, "\n");
                 }
                 fclose(outPitch);
+                wasvalue = value;
                 reverseMoving = true;
                 }
             }
@@ -596,8 +599,8 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             {
                 if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
                     stack.push_front('b');
-                digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
-                if(value == 999) 
+                digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty, reverse);
+                if(value == 999 && !reverse) 
                 {
                     endd = true;
                     fclose(in);
@@ -638,9 +641,9 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     return endofmove;
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse)
 {
-    if(value == 999 || value == 1099)
+    if(value == 999 || value == 1099 && reverse == false)
     {
         FILE* out;
         out = fopen("Pitch.txt", "w");
