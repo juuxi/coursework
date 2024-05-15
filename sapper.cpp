@@ -404,11 +404,12 @@ void printPitch(int pitch[20][20], int n, int m)
 }
 
 void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
-void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty);
+void diggingReverse(int pitch[20][20], int n, int m, int &ySmile, int &xSmile, int &value, int &numOfEmpty, int &wasvalue);
 
 int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, int& value, bool reverse)
 {
-    FILE* in; //note: markaround sometimes works inproperly in corners
+    int wasvalue = value;
+    FILE* in;
     in = fopen("Recording.txt", "r");
     if (!in && reverse)
     {
@@ -420,6 +421,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     int numOfEmpty = m * n, i = 0;
     preM.x = xSmile;
     preM.y = ySmile;
+    bool reverseMove = false;
     if(!reverse) value = pitch[ySmile][xSmile];
     pitch[ySmile][xSmile] = SMILE_NUM;
     bool endd = false, reverseMoving = false, noWayReverse = false, reverseDigging = false;
@@ -480,6 +482,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     case 'B': movement = 'A'; break;
                     case 'C': movement = 'D'; break;
                 }
+                reverseMove = true;
             }
             if (checkerArrow == 'd')
             {
@@ -520,7 +523,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             if(checkerArrow != 'a' && checkerArrow != 'd')
             {
                 movement = checkerArrow;
-                if (!reverseMoving)
+                if (!reverseMoving && wasvalue != 999 && wasvalue != 1099)
                 {
                 FILE* outPitch;
                 outPitch = fopen("Pitch.txt", "w");
@@ -539,8 +542,8 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                         fprintf(outPitch, "\n");
                 }
                 fclose(outPitch);
-                }
                 reverseMoving = true;
+                }
             }
         }
         if(movement == 27)
@@ -600,8 +603,13 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     fclose(in);
                     printf("Нажмите любую клавишу для продолжения\n");
                     disable_waiting_for_enter();
-                    getchar();
+                    char g = getchar();
                     restore_terminal_settings();
+                    if(g == 27)
+                    {
+                        getchar();
+                        getchar();
+                    }
                 }
                 if(numOfEmpty == numOfBombs)
                 {
@@ -610,7 +618,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     endofmove = WIN_END;
                 }
             }
-            else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty);
+            else diggingReverse(pitch, n, m, ySmile, xSmile, value, numOfEmpty, wasvalue);
             reverseDigging = false;
             break;
 
@@ -641,6 +649,9 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
             printf("Ошибка при открытии файла\n"); 
             return;
         }
+        fprintf(out, "%d ", xSmile);
+        fprintf(out, "%d ", ySmile);
+        fprintf(out, "\n");
         for(int i = 0; i < n; i++)
         {
             for(int j = 0; j < m; j++)
@@ -775,9 +786,9 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
     }
 }
 
-void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty)
+void diggingReverse(int pitch[20][20], int n, int m, int &ySmile, int &xSmile, int &value, int &numOfEmpty, int &wasvalue)
 {
-    if(value == 999 || value == 1099) 
+    if(value == 999 || value == 1099 || wasvalue == 999 || wasvalue == 1099) 
     {
         FILE* in;
         in = fopen("Pitch.txt", "r");
@@ -786,6 +797,9 @@ void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int
             printf("Ошибка при открытии файла\n"); 
             return;
         }
+        fscanf(in, "%d ", &xSmile);
+        fscanf(in, "%d ", &ySmile);
+        fscanf(in, "\n");
         for(int i = 0; i < n; i++)
         {
             for(int j = 0; j < m; j++)
@@ -793,6 +807,9 @@ void diggingReverse(int pitch[20][20], int n, int m, int ySmile, int xSmile, int
             fscanf(in, "\n");
         }
         fclose(in);
+        value = wasvalue;
+        wasvalue = 0;
+        return;
     }
 
     if(value > 0 && value < 10)
@@ -1143,7 +1160,7 @@ int main()
                 char reverse = '\0';
                 while(reverse != 'y' && reverse != 'n')
                 {
-                    printf("Хотите ли вы посмотреть запись игры [y/n]? ");
+                    /* if(reverse != 91 && reverse != 'D' && reverse != 'C')  */printf("Хотите ли вы посмотреть запись игры [y/n]? ");
                     disable_waiting_for_enter();
                     reverse = getchar();
                     restore_terminal_settings();
@@ -1162,7 +1179,7 @@ int main()
                         printf("\n");
                         break;
                     }
-                    printf("\n");
+                    /* if(reverse != 91 && reverse != 'D' && reverse != 'C')  */printf("\n");
                 }
             }
             break;
