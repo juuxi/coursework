@@ -403,11 +403,12 @@ void printPitch(int pitch[20][20], int n, int m)
     }
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse);
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse, bool &banmoving);
 void diggingReverse(int pitch[20][20], int n, int m, int &ySmile, int &xSmile, int &value, int &numOfEmpty, int &wasvalue);
 
 int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int numOfBombs, int& value, bool reverse)
 {
+    bool banmoving = false;
     int wasvalue = value;
     FILE* in;
     in = fopen("Recording.txt", "r");
@@ -484,6 +485,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
                     case 'C': movement = 'D'; break;
                 }
                 reverseMove = true;
+                banmoving = false;
             }
             if (checkerArrow == 'd')
             {
@@ -524,28 +526,40 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             }
             if(checkerArrow != 'a' && checkerArrow != 'd')
             {
-                movement = checkerArrow;
-                if (!reverseMoving && wasvalue != 999 && wasvalue != 1099)
+                if(!banmoving)
                 {
-                FILE* outPitch;
-                outPitch = fopen("Pitch.txt", "w");
-                if (!outPitch)
-                {
-                    printf("Ошибка при открытии файла\n"); 
-                    return -56;
+                    movement = checkerArrow;
+                    if (!reverseMoving && wasvalue != 999 && wasvalue != 1099)
+                    {
+                    FILE* outPitch;
+                    outPitch = fopen("Pitch.txt", "w");
+                    if (!outPitch)
+                    {
+                        printf("Ошибка при открытии файла\n"); 
+                        return -56;
+                    }
+                    fprintf(outPitch, "%d ", xSmile);
+                    fprintf(outPitch, "%d ", ySmile);
+                    fprintf(outPitch, "\n");
+                    for(int i = 0; i < n; i++)
+                    {
+                        for(int j = 0; j < m; j++)
+                            fprintf(outPitch, "%5d", pitch[i][j]);
+                            fprintf(outPitch, "\n");
+                    }
+                    fclose(outPitch);
+                    wasvalue = value;
+                    reverseMoving = true;
                 }
-                fprintf(outPitch, "%d ", xSmile);
-                fprintf(outPitch, "%d ", ySmile);
-                fprintf(outPitch, "\n");
-                for(int i = 0; i < n; i++)
-                {
-                    for(int j = 0; j < m; j++)
-                        fprintf(outPitch, "%5d", pitch[i][j]);
-                        fprintf(outPitch, "\n");
                 }
-                fclose(outPitch);
-                wasvalue = value;
-                reverseMoving = true;
+                else 
+                {
+                    if (checkerArrow == 'Q') movement = 'Q';
+                    else 
+                    {
+                        printf("Произошел взрыв бомбы, возможны только выход и перемотка на d\n");
+                        movement = '\0';
+                    }
                 }
             }
         }
@@ -599,7 +613,7 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
             {
                 if((value == 999 || value == 1099) || (value == 1000 || value == 1100) || (value > 1000 && value < 1010) || (value > 1100 && value < 1110)) 
                     stack.push_front('b');
-                digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty, reverse);
+                digging(pitch, n, m, ySmile, xSmile, value, numOfEmpty, reverse, banmoving);
                 if(value == 999 && !reverse) 
                 {
                     endd = true;
@@ -641,9 +655,9 @@ int movingSmile(int pitch[20][20], int n, int m, int& ySmile, int& xSmile, int n
     return endofmove;
 }
 
-void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse)
+void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value, int &numOfEmpty, bool reverse, bool &banmoving)
 {
-    if(value == 999 || value == 1099 && reverse == false)
+    if((value == 999 || value == 1099))
     {
         FILE* out;
         out = fopen("Pitch.txt", "w");
@@ -674,6 +688,7 @@ void digging(int pitch[20][20], int n, int m, int ySmile, int xSmile, int &value
         system("clear");
         printPitch(pitch, n, m);
         printf("Вы проиграли\n");
+        if (reverse) banmoving = true;
     }
 
     if(value == 1000 || value == 1100)
@@ -810,7 +825,7 @@ void diggingReverse(int pitch[20][20], int n, int m, int &ySmile, int &xSmile, i
             fscanf(in, "\n");
         }
         fclose(in);
-        value = wasvalue;
+        if(wasvalue != 0) value = wasvalue;
         wasvalue = 0;
         return;
     }
@@ -1064,7 +1079,7 @@ int main()
     if (pos == 5) printf("5. Вывод таблицы рекордов <--\n"); else printf("5. Вывод таблицы рекордов\n");
     if (pos == 6) printf("6. Выход из программы <--\n"); else printf("6. Выход из программы\n");
     printf ("\nВысота поля = %d Длина поля = %d Число бомб = %d\n\n", n, m, numberOfBombs);
-    if(pos != 6) printf ("Выберите пункт меню нажатием стрелочек вверх-вниз или нажатием соответствующей цифры\n");
+    //if(pos != 6) printf ("Выберите пункт меню нажатием стрелочек вверх-вниз или нажатием соответствующей цифры\n");
     disable_waiting_for_enter();
     menuCatcher = getchar();
     restore_terminal_settings();
@@ -1081,7 +1096,7 @@ int main()
             else printf("Невозможно сместить стрелочку в указанном направлении\n\n");
             break;
             case 'B':
-            if (pos != 5) pos++;
+            if (pos != 6) pos++;
             else printf("Невозможно сместить стрелочку в указанном направлении\n\n");
             break;
         }
